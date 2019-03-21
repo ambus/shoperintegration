@@ -6,5 +6,62 @@
   "repository": "git@github.com:ambus/shoperintegration.git",
   "author": "Szymon Standarski",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "keywords": [
+    "shoper",
+    "intergration",
+    "api",
+    "service"
+  ],
+  "scripts": {
+    "test-coverage": "NODE_ENV=development jest --coverage",
+    "test": "NODE_ENV=development jest --watch",
+    "test:console": "NODE_ENV=development jest --watch --verbose false",
+    "build": "webpack",
+    "build-type-script": "tsc",
+    "start": "nodemon ./src/index.js",
+    "start:live": "NODE_ENV=development nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts",
+    "start:dist": "NODE_ENV=production nodemon ./disc/server.js",
+    "release": "standard-version",
+    "karma": "karma start"
+  },
+  "dependencies": {
+    "chokidar": "^2.1.2",
+    "csv-parse": "^4.3.4",
+    "log4js": "^4.0.2",
+    "node-fetch": "^2.3.0",
+    "path": "^0.12.7",
+    "promise.prototype.finally": "^3.1.0",
+    "rxjs": "^6.4.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.11.4",
+    "@types/node-fetch": "^2.1.7",
+    "@types/promise.prototype.finally": "^2.0.3",
+    "gulp": "^4.0.0",
+    "jest": "^24.5.0",
+    "jest-cli": "^24.5.0",
+    "nodemon": "^1.18.10",
+    "standard-version": "^5.0.2",
+    "ts-jest": "^24.0.0",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "src/.*.(test|spec).(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "node"
+    ]
+  }
 }
