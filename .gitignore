@@ -7,6 +7,8 @@
 /release-builds
 /publish
 /~
+yarn.lock
+yarn-error.log
 
 
 # dependencies
