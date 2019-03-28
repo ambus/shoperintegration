@@ -21,7 +21,7 @@
     "build-type-script": "tsc",
     "start": "nodemon ./src/index.js",
     "start:live": "NODE_ENV=development nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts",
-    "start:dist": "NODE_ENV=production nodemon ./disc/server.js",
+    "start:dist": "NODE_ENV=production nodemon ./dist/server.js",
     "release": "standard-version",
     "karma": "karma start"
   },
