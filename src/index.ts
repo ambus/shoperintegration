@@ -1,15 +1,28 @@
-import { configure, getLogger } from "log4js";
+import { configure, getLogger, Configuration } from "log4js";
+import * as fs from "fs";
+import * as path from "path";
+import { Config } from "./models/config";
 
-//TODO przenieść konfigurację do pliku
-configure({
-  appenders: {
-    out: { type: "stdout" },
-    app: { type: "file", filename: "log4js/shoper.log", maxLogSize: 10485760, numBackups: 3 }
-  },
-  categories: {
-    default: { appenders: ["out", "app"], level: "trace" }
-  }
-});
+const CONFIG_FILE_NAME = "config.json";
+var config: Config;
+
+try {
+  config = JSON.parse(fs.readFileSync(path.resolve(__dirname, CONFIG_FILE_NAME), "utf8"));
+} catch (err) {
+  console.error("Napotkano błąd podczas pobierania konfiguracji. Ustawiono domyślną konfigurację", err);
+  config = {
+    log4js: {
+      appenders: {
+        out: { type: "stdout" }
+      },
+      categories: {
+        default: { appenders: ["out"], level: "trace" }
+      }
+    }
+  };
+}
+
+configure(config.log4js);
 
 const logger = getLogger();
 
