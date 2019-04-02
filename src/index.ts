@@ -7,9 +7,9 @@ const CONFIG_FILE_NAME = "config.json";
 var config: Config;
 
 try {
-  config = JSON.parse(fs.readFileSync(path.resolve(__dirname, CONFIG_FILE_NAME), "utf8"));
+  config = JSON.parse(fs.readFileSync(CONFIG_FILE_NAME, "utf8"));
 } catch (err) {
-  console.error("Napotkano błąd podczas pobierania konfiguracji. Ustawiono domyślną konfigurację", err);
+  console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${CONFIG_FILE_NAME}. Ustawiono domyślną konfigurację`, err);
   config = {
     log4js: {
       appenders: {
