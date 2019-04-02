@@ -1,5 +1,6 @@
 import { configure, getLogger } from "log4js";
 
+//TODO przenieść konfigurację do pliku
 configure({
   appenders: {
     out: { type: "stdout" },
