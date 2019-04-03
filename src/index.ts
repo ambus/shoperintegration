@@ -1,6 +1,5 @@
-import { configure, getLogger, Configuration } from "log4js";
+import { configure, getLogger } from "log4js";
 import * as fs from "fs";
-import * as path from "path";
 import { Config } from "./models/config";
 
 const CONFIG_FILE_NAME = "config.json";
