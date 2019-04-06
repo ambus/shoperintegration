@@ -38,10 +38,23 @@ describe("FileWatcher", () => {
 
   it("w przypadku napotkania błędów podczas odczytu startWatch powinien wyrzucić wyjątek", () => {
     fileWatcher.startWatch(path.resolve(__dirname, `${TEST_FILE_PATH}blad`), true);
-  })
+  });
 
   it("powinien istnieć strumień z przychodzącymi danymi - do którego można się podpiąć", () => {
     expect(fileWatcher.streamWithDataInsertedToWatchingFile).toBeDefined();
+    let stream = fileWatcher.streamWithDataInsertedToWatchingFile;
+    expect(stream instanceof Observable).toBeTruthy();
+  });
+
+  it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku podczas uruchamiania obserwowania", done => {
+    let fw = new FileWatcher();
+    fs.unlinkSync(TEST_FILE_PATH);
+    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+      expect(data).toEqual(EXAMPLE_DATA)
+      done();
+    });
+    fs.writeFileSync(TEST_FILE_PATH, EXAMPLE_DATA, {encoding: 'utf8'});
+    fw.startWatch(TEST_FILE_PATH, true);
   });
 
   it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku", () => {});
