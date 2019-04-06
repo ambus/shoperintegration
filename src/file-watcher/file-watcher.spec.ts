@@ -2,6 +2,8 @@ import { FileWatcher } from "./file-watcher";
 import { Observable } from "rxjs";
 const path = require("path");
 import * as fs from "fs";
+import { Config } from "../config/config";
+import { CONFIG_FILE_NAME } from "../index";
 
 const TEST_FILE_PATH = "../../tmp/test.csv";
 const EXAMPLE_DATA = `product_code;stock;price
@@ -10,6 +12,10 @@ BSZK0F1FLE051;   3;139,57
 BSZK0F1FLE011;   3;139,57
 BSZK0IZMWAS02;   2;16,00
 ICAZG10KLD;  42;120,0`;
+
+beforeAll(() => {
+  Config.getInstance(CONFIG_FILE_NAME);
+});
 
 describe("FileWatcher", () => {
   let fileWatcher: FileWatcher;
@@ -20,6 +26,10 @@ describe("FileWatcher", () => {
   it("Czy jest zdefiniowana klasa FileWatcher", done => {
     expect(FileWatcher).toBeDefined();
     done();
+  });
+
+  it("powinan zostać zainicjowana konfiguracja", () => {
+    expect(Config.getInstance()).toHaveProperty("encoding");
   });
 
   it("powinien zawierać instancję loggera", () => {
