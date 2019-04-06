@@ -7,5 +7,6 @@
     "categories": {
       "default": { "appenders": ["out", "app"], "level": "trace" }
     }
-  }
+  },
+  "encoding": "utf8"
 }

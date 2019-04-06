@@ -1,5 +1,6 @@
 import { Configuration } from "log4js";
 import * as fs from "fs";
+import { ConfigElement } from "../models/config-element";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
 
@@ -8,6 +9,7 @@ export class Config {
   public log4js: Configuration;
   public configurationType: string;
   public static filePath: string;
+  public encoding: string;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -27,15 +29,17 @@ export class Config {
       let config = JSON.parse(fs.readFileSync(filePath, "utf8"));
       this.log4js = config.log4js;
       this.configurationType = `File ${filePath}`;
+      this.encoding = config.encoding;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
       this.log4js = config.log4js;
       this.configurationType = config.configurationType;
+      this.encoding = config.encoding;
     }
   }
 
-  public loadDefaultConfiguration(): { log4js: Configuration; configurationType: string } {
+  public loadDefaultConfiguration(): ConfigElement{
     return {
       log4js: {
         appenders: {
@@ -45,6 +49,7 @@ export class Config {
           default: { appenders: ["out"], level: "trace" }
         }
       },
+      encoding: 'utf8',
       configurationType: "default"
     };
   }

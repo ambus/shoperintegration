@@ -42,6 +42,7 @@ describe("Konfiguracja - domyślne wartości", () => {
     expect(config).toBeDefined();
     expect(config.log4js).toBeDefined();
     expect(config.configurationType).toEqual("default");
+    expect(config.encoding).toEqual('utf8');
     done();
   });
   afterAll(() => {
