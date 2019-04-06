@@ -1,14 +1,18 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, Subject } from "rxjs";
+import * as fs from "fs";
+import { Config } from "../config/config";
 
 export class FileWatcher {
   private watchingFile: string;
   public logger: Logger;
   private $dataFromFileStream: Subject<string>;
+  private config: Config;
 
   constructor() {
     this.$dataFromFileStream = new Subject();
     this.logger = getLogger();
+    this.config = Config.getInstance();
   }
 
   public get streamWithDataInsertedToWatchingFile(): Observable<string> {
