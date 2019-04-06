@@ -82,6 +82,21 @@ describe("FileWatcher", () => {
   });
 
   it("po zmianie danych w pliku powinny pojawić się dane w strumieniu", () => {});
-  it("powinien usunąć plik z danymi po przeczytaniu ich", () => {});
+
+  it("powinien usunąć plik z danymi po przeczytaniu ich", done => {
+    let fw = new FileWatcher();
+    if (fs.existsSync(TEST_FILE_PATH)) {
+      fs.unlinkSync(TEST_FILE_PATH);
+    }
+    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+      expect(data).toEqual(EXAMPLE_DATA);
+      expect(fs.existsSync(TEST_FILE_PATH)).toBeFalsy();
+      done();
+    });
+    fs.writeFileSync(TEST_FILE_PATH, EXAMPLE_DATA, { encoding: "utf8" });
+    fw.startWatch(TEST_FILE_PATH, true);
+  });
+
+  
   it("w przypadku błędu odczytu dane powinny zostać zalogowane ", () => {});
 });
