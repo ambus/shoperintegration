@@ -1,5 +1,8 @@
 import { FileWatcher } from "./file-watcher";
+import { Observable } from "rxjs";
 const path = require("path");
+import * as fs from "fs";
+
 const TEST_FILE_PATH = "../../tmp/test.csv";
 const EXAMPLE_DATA = `product_code;stock;price
 BUKWT2010;  41;110,0
@@ -12,7 +15,7 @@ describe("FileWatcher", () => {
   let fileWatcher: FileWatcher;
   beforeEach(() => {
     fileWatcher = new FileWatcher();
-  })
+  });
 
   it("Czy jest zdefiniowana klasa FileWatcher", done => {
     expect(FileWatcher).toBeDefined();
