@@ -57,9 +57,7 @@ describe("FileWatcher", () => {
     fw.startWatch(TEST_FILE_PATH, true);
   });
 
-  it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku", () => {});
   it("po zmianie danych w pliku powinny pojawić się dane w strumieniu", () => {});
   it("powinien usunąć plik z danymi po przeczytaniu ich", () => {});
-  it("klasa powinna prawidłowo odczytać wgrane dane do pliku", () => {});
   it("w przypadku błędu odczytu dane powinny zostać zalogowane ", () => {});
 });
