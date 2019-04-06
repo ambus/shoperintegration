@@ -69,4 +69,9 @@ export class FileWatcher {
       });
     });
   }
+
+  public deleteFile(filepath: string): void {
+    this.logger.warn(`Usuwanie pliku ${filepath}`);
+    fs.unlinkSync(filepath);
+  }
 }
