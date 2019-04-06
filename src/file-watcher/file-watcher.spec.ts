@@ -58,13 +58,27 @@ describe("FileWatcher", () => {
 
   it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku podczas uruchamiania obserwowania", done => {
     let fw = new FileWatcher();
-    fs.unlinkSync(TEST_FILE_PATH);
+    if (fs.existsSync(TEST_FILE_PATH)) {
+      fs.unlinkSync(TEST_FILE_PATH);
+    }
     fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
-      expect(data).toEqual(EXAMPLE_DATA)
+      expect(data).toEqual(EXAMPLE_DATA);
       done();
     });
-    fs.writeFileSync(TEST_FILE_PATH, EXAMPLE_DATA, {encoding: 'utf8'});
+    fs.writeFileSync(TEST_FILE_PATH, EXAMPLE_DATA, { encoding: "utf8" });
     fw.startWatch(TEST_FILE_PATH, true);
+  });
+
+  it("funkcja usuwająca pliki powinna usunąć wskazany plik", done => {
+    fs.writeFileSync(TEST_FILE_PATH, EXAMPLE_DATA, { encoding: "utf8" });
+    if (fs.existsSync(TEST_FILE_PATH)) {
+      fs.unlinkSync(TEST_FILE_PATH);
+      expect(true).toBeTruthy();
+      done();
+    } else {
+      expect(false).toBeTruthy();
+      done();
+    }
   });
 
   it("po zmianie danych w pliku powinny pojawić się dane w strumieniu", () => {});

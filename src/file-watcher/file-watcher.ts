@@ -25,7 +25,7 @@ export class FileWatcher {
       if (readOnStart) {
         this.readFileAndSendThemToStream(`${filepath}`);
       }
-      this.watchFile(filepath);
+      //TODO this.watchFile(filepath);
       this.watchingFile = filepath;
     } catch (err) {
       this.logger.error(`Napotkano błąd podczas odczytu pliku ${filepath}. Wymagane jest ponowne uruchomienie obserwowania plików!`, err);
