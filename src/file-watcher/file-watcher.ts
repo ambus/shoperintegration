@@ -1,6 +1,8 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, Subject } from "rxjs";
 import * as fs from "fs";
+import { FSWatcher, watch } from "chokidar";
+
 import { Config } from "../config/config";
 
 export class FileWatcher {
@@ -8,6 +10,7 @@ export class FileWatcher {
   public logger: Logger;
   private $dataFromFileStream: Subject<string>;
   private config: Config;
+  private watcher: FSWatcher;
 
   constructor() {
     this.$dataFromFileStream = new Subject();
@@ -51,8 +54,8 @@ export class FileWatcher {
         }
         resolve();
       } catch (err) {
-        this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}`, err);
-        throw err;
+        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}`, err);
+        reject(err);
       }
     });
   }
@@ -62,7 +65,7 @@ export class FileWatcher {
       fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
         if (err) {
           this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-          throw err;
+          reject(err);
         }
         this.logger.info(`Odczytano nowe dane:`, data);
         resolve(data);
@@ -73,5 +76,35 @@ export class FileWatcher {
   public deleteFile(filepath: string): void {
     this.logger.warn(`Usuwanie pliku ${filepath}`);
     fs.unlinkSync(filepath);
+  }
+
+  public watchFile(pathToWatch: string, fileToWatch: string): void {
+    this.logger.debug(`Start obserwowania katalogu ${pathToWatch}`);
+    this.watcher = watch(`${pathToWatch}`, {
+      persistent: true,
+      usePolling: true
+    });
+
+    this.watcher.on("add", path => {
+      this.logger.warn(`Został dodany plik ${path}`);
+      if (path.toLowerCase() === `${pathToWatch}${fileToWatch}`.toLowerCase()) {
+        try {
+          this.readFileAndSendThemToStream(`${path}`);
+        } catch (err) {
+          this.logger.error(`Napotkano błąd podczas próby obserwowania pliku ${pathToWatch}${fileToWatch}`, err);
+        }
+      }
+    });
+
+    this.watcher.on("change", (path: string) => {
+      this.logger.debug(`Nastąpiła zmiana w pliku ${path}`);
+      if (path.toLowerCase() === `${pathToWatch}${fileToWatch}`.toLowerCase()) {
+        try {
+          this.readFileAndSendThemToStream(`${path}`);
+        } catch (err) {
+          this.logger.error(`Napotkano błąd podczas próby obserwowania pliku ${pathToWatch}${fileToWatch}`, err);
+        }
+      }
+    });
   }
 }
