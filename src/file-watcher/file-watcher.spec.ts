@@ -1,6 +1,7 @@
 import { FileWatcher } from "./file-watcher";
 import { Observable } from "rxjs";
 const path = require("path");
+const mock = require("mock-fs");
 import * as fs from "fs";
 import { Config } from "../config/config";
 import { CONFIG_FILE_NAME } from "../index";
