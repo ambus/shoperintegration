@@ -19,16 +19,16 @@ export class FileWatcher {
     return this.$dataFromFileStream.asObservable();
   }
 
-  public startWatch(filepath: string, readOnStart: boolean): void {
-    this.logger.debug(`Start obserwowania pliku ${filepath}`);
+  public startWatch(filePath: string, fileName: string, readOnStart: boolean): void {
+    this.logger.debug(`Start obserwowania pliku ${filePath}${fileName}`);
     try {
       if (readOnStart) {
-        this.readFileAndSendThemToStream(`${filepath}`);
+        this.readFileAndSendThemToStream(`${filePath}${fileName}`);
       }
-      //TODO this.watchFile(filepath);
-      this.watchingFile = filepath;
+      this.watchFile(filePath, fileName);
+      this.watchingFile = `${filePath}${fileName}`;
     } catch (err) {
-      this.logger.error(`Napotkano błąd podczas odczytu pliku ${filepath}. Wymagane jest ponowne uruchomienie obserwowania plików!`, err);
+      this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie obserwowania plików!`, err);
       this.watchingFile = undefined;
       throw err;
     }
