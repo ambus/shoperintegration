@@ -23,7 +23,7 @@ export class FileWatcher {
   }
 
   public startWatch(filePath: string, fileName: string, readOnStart: boolean): void {
-    this.logger.debug(`Start obserwowania pliku ${filePath}${fileName}`);
+    this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
     try {
       if (readOnStart) {
         this.readFileAndSendThemToStream(`${filePath}${fileName}`);
@@ -86,25 +86,28 @@ export class FileWatcher {
     });
 
     this.watcher.on("add", path => {
-      this.logger.warn(`Został dodany plik ${path}`);
-      if (path.toLowerCase() === `${pathToWatch}${fileToWatch}`.toLowerCase()) {
-        try {
-          this.readFileAndSendThemToStream(`${path}`);
-        } catch (err) {
-          this.logger.error(`Napotkano błąd podczas próby obserwowania pliku ${pathToWatch}${fileToWatch}`, err);
-        }
-      }
+      this.logger.info(`Został dodany plik ${path}`);
+      this.ifChangeWasInWatchFileReadThem(path, `${pathToWatch}/${fileToWatch}`);
     });
 
     this.watcher.on("change", (path: string) => {
-      this.logger.debug(`Nastąpiła zmiana w pliku ${path}`);
-      if (path.toLowerCase() === `${pathToWatch}${fileToWatch}`.toLowerCase()) {
-        try {
-          this.readFileAndSendThemToStream(`${path}`);
-        } catch (err) {
-          this.logger.error(`Napotkano błąd podczas próby obserwowania pliku ${pathToWatch}${fileToWatch}`, err);
-        }
-      }
+      this.logger.info(`Został zmodyfikowany plik ${path}`);
+      this.ifChangeWasInWatchFileReadThem(path, `${pathToWatch}/${fileToWatch}`);
     });
+  }
+
+  public ifChangeWasInWatchFileReadThem(path: string, filePathToWatch: string): void {
+    this.logger.info(
+      `Został zmodyfikowany plik ${path.toLowerCase()} w katalogu ${filePathToWatch.toLowerCase()}. Który ${
+        path.toLowerCase() === `${filePathToWatch}`.toLowerCase() ? "spełnia warunek" : "nie spełnia warunku"
+      }`
+    );
+    if (path.toLowerCase() === `${filePathToWatch}`.toLowerCase()) {
+      try {
+        this.readFileAndSendThemToStream(`${path}`);
+      } catch (err) {
+        this.logger.error(`Napotkano błąd podczas próby odczytania pliku ${filePathToWatch}`, err);
+      }
+    }
   }
 }

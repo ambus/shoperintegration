@@ -152,6 +152,51 @@ describe("FileWatcher", () => {
     }
   });
 
-  it("w przypadku błędu odczytu dane powinny zostać zalogowane", () => {});
-  it("po zmianie danych w pliku powinny pojawić się dane w strumieniu", () => {});
+  it("watchFile powinien przekazać do strumienia informację o zmianie w pliku", done => {
+    let fileName = `${stringGenerator()}.csv`;
+    let fw = new FileWatcher();
+
+    spyOn(fw, "readFileAndSendThemToStream").and.callFake(function(obj: any) {
+      fs.unlinkSync(`tmp/${fileName}`);
+      done();
+    });
+
+    fw.watchFile(`tmp`, fileName);
+    fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
+  });
+
+  it("po zmianie danych w pliku powinny pojawić się one w strumieniu", done => {
+    let fileName = `${stringGenerator()}.csv`;
+    let fw = new FileWatcher();
+    let counter = 0;
+
+    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+      if (counter === 0) {
+        expect(data).toEqual("");
+        counter += 1;
+        fs.writeFileSync(`tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
+      } else {
+        expect(data).toEqual(EXAMPLE_DATA);
+        done();
+      }
+    });
+    fw.startWatch(`tmp`, fileName, true);
+    fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
+  });
+
+  it("w przypadku błędu odczytu watcher powinien zalogować błąd odczytu", done => {
+    let fileName = `${stringGenerator()}.csv`;
+    let fw = new FileWatcher();
+
+    spyOn(fw.logger, "error").and.callFake(function(obj: any) {
+      expect(obj).toContain(`Napotkano błąd podczas próby odczytania pliku tmp/${fileName}`);
+      done();
+    });
+    
+    spyOn(fw, "readFileAndSendThemToStream").and.callFake(function() {
+      throw new Error("Błąd odczytu");
+    });
+
+    fw.ifChangeWasInWatchFileReadThem(`tmp/${fileName}`, `tmp/${fileName}`);
+  });
 });
