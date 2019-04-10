@@ -152,7 +152,7 @@ describe("FileWatcher", () => {
     }
   });
 
-  it("watchFile powinien przekazać do strumienia informację o zmianie w pliku", done => {
+  it("watchFile powinien zwrócić Subject w którym powinna przyjść informacja o pojawieniu się pliku", done => {
     let fileName = `${stringGenerator()}.csv`;
     let fw = new FileWatcher();
 
@@ -161,7 +161,12 @@ describe("FileWatcher", () => {
       done();
     });
 
-    fw.watchFile(`tmp`, fileName);
+    fw.watchFile(`tmp`).subscribe((path: string) => {
+      if (path.toLowerCase() === `tmp/${fileName}`.toLowerCase()) {
+        fs.unlinkSync(`tmp/${fileName}`);
+        done();
+      }
+    })
     fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
   });
 
