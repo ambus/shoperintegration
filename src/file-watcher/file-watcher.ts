@@ -1,5 +1,7 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, Subject } from "rxjs";
+import { tap } from "rxjs/operators";
+
 import * as fs from "fs";
 import { FSWatcher, watch } from "chokidar";
 
@@ -10,7 +12,6 @@ export class FileWatcher {
   public logger: Logger;
   private $dataFromFileStream: Subject<string>;
   private config: Config;
-  private watcher: FSWatcher;
 
   constructor() {
     this.$dataFromFileStream = new Subject();
@@ -28,7 +29,11 @@ export class FileWatcher {
       if (readOnStart) {
         this.readFileAndSendThemToStream(`${filePath}${fileName}`);
       }
-      this.watchFile(filePath, fileName);
+      this.watchFile(filePath)
+        .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
+        .subscribe((path: string) => {
+          this.ifChangeWasInWatchFileReadThem(path, `${filePath}/${fileName}`);
+        });
       this.watchingFile = `${filePath}${fileName}`;
     } catch (err) {
       this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie obserwowania plików!`, err);
@@ -78,22 +83,16 @@ export class FileWatcher {
     fs.unlinkSync(filepath);
   }
 
-  public watchFile(pathToWatch: string, fileToWatch: string): void {
+  public watchFile(pathToWatch: string): Subject<string> {
     this.logger.debug(`Start obserwowania katalogu ${pathToWatch}`);
-    this.watcher = watch(`${pathToWatch}`, {
+    const sub = new Subject<string>();
+    watch(`${pathToWatch}`, {
       persistent: true,
       usePolling: true
-    });
-
-    this.watcher.on("add", path => {
-      this.logger.info(`Został dodany plik ${path}`);
-      this.ifChangeWasInWatchFileReadThem(path, `${pathToWatch}/${fileToWatch}`);
-    });
-
-    this.watcher.on("change", (path: string) => {
-      this.logger.info(`Został zmodyfikowany plik ${path}`);
-      this.ifChangeWasInWatchFileReadThem(path, `${pathToWatch}/${fileToWatch}`);
-    });
+    })
+      .on("add", (path: string) => sub.next(path))
+      .on("change", (path: string) => sub.next(path));
+    return sub;
   }
 
   public ifChangeWasInWatchFileReadThem(path: string, filePathToWatch: string): void {
