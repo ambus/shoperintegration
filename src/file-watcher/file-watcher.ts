@@ -1,11 +1,12 @@
 import { getLogger, Logger } from "log4js";
-import { Observable, Subject } from "rxjs";
-import { tap } from "rxjs/operators";
+import { Observable, Subject, throwError } from "rxjs";
+import { tap, retry, finalize } from "rxjs/operators";
 
 import * as fs from "fs";
 import { FSWatcher, watch } from "chokidar";
 
 import { Config } from "../config/config";
+import { AnonymousSubject } from "rxjs/internal/Subject";
 
 export class FileWatcher {
   private watchingFile: string;
@@ -51,9 +52,13 @@ export class FileWatcher {
     return new Promise(async (resolve, reject) => {
       try {
         if (fs.existsSync(filePath)) {
-          let returnString = await this.readFile(filePath);
-          await this.deleteFile(filePath);
-          this.$dataFromFileStream.next(returnString);
+          this.readFile(filePath)
+            .pipe(
+              tap(val => this.logger.info("Odczytano nowe dane")),
+              retry(5),
+              tap(() => this.deleteFile(filePath))
+            )
+            .subscribe((res: string) => this.$dataFromFileStream.next(res), (err: any) => this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err));
         } else {
           this.logger.debug(`Plik ${filePath} nie istnieje`);
         }
@@ -65,17 +70,18 @@ export class FileWatcher {
     });
   }
 
-  public readFile(filePath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
+  public readFile(filePath: string): Observable<string> {
+    return Observable.create((function (observer: AnonymousSubject<string>) {
       fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
         if (err) {
           this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-          reject(err);
+          observer.error(err);
         }
         this.logger.info(`Odczytano nowe dane:`, data);
-        resolve(data);
+        observer.next(data);
+        observer.complete();
       });
-    });
+    }).bind(this))
   }
 
   public deleteFile(filepath: string): void {

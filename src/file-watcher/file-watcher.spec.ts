@@ -108,12 +108,15 @@ describe("FileWatcher", () => {
   });
 
   it("w przypadku błędu odczytu pliku powinien zostać wyrzucony wyjątek", async done => {
-    let fw = new FileWatcher();
-    fw.readFile("test.error.csv").catch((err: Error) => {
-      expect(err.name).toEqual("Error");
-      expect(err.message).toEqual("ENOENT: no such file or directory, open 'test.error.csv'");
-      done();
-    });
+
+    new FileWatcher().readFile("test.error.csv").subscribe(
+      (res: string) => expect(false).toBeTruthy(),
+      (err: any) => {
+        expect(err.name).toEqual("Error");
+        expect(err.message).toEqual("ENOENT: no such file or directory, open 'test.error.csv'");
+        done();
+      }
+    );
   });
 
   it("w przypadku błędu odczytu pliku funkcja readFileAndSendThemToStream powinna przechwycić wyjątek", done => {
@@ -160,7 +163,7 @@ describe("FileWatcher", () => {
         fs.unlinkSync(`tmp/${fileName}`);
         done();
       }
-    })
+    });
     fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
   });
 
@@ -191,11 +194,14 @@ describe("FileWatcher", () => {
       expect(obj).toContain(`Napotkano błąd podczas próby odczytania pliku tmp/${fileName}`);
       done();
     });
-    
+
     spyOn(fw, "readFileAndSendThemToStream").and.callFake(function() {
       throw new Error("Błąd odczytu");
     });
 
     fw.ifChangeWasInWatchFileReadThem(`tmp/${fileName}`, `tmp/${fileName}`);
   });
+
+  it("w przypadku blędu odczytu pliku serwis powinien ponowić próbę odczytania 5 krotnie", () => {
+  })
 });
