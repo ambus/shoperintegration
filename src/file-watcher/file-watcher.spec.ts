@@ -154,14 +154,8 @@ describe("FileWatcher", () => {
 
   it("watchFile powinien zwrócić Subject w którym powinna przyjść informacja o pojawieniu się pliku", done => {
     let fileName = `${stringGenerator()}.csv`;
-    let fw = new FileWatcher();
 
-    spyOn(fw, "readFileAndSendThemToStream").and.callFake(function(obj: any) {
-      fs.unlinkSync(`tmp/${fileName}`);
-      done();
-    });
-
-    fw.watchFile(`tmp`).subscribe((path: string) => {
+    new FileWatcher().watchFile(`tmp`).subscribe((path: string) => {
       if (path.toLowerCase() === `tmp/${fileName}`.toLowerCase()) {
         fs.unlinkSync(`tmp/${fileName}`);
         done();
