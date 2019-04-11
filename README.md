@@ -6,6 +6,12 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
 ### TODO
 * [X] add logger to file
 * [X] add file watcher service to locate change in input file
-* [ ] refactor fileWatcher to use stream
+* [ ] refactor fileWatcher to use streams
+    - [ ] startWatch
+    - [ ] readFileAndSendThemToStream
+    - [X] readFile
+    - [ ] deleteFile
+    - [X] watchFile
+    - [ ] ifChangeWasInWatchFileReadThem
 * [ ] more..
 
