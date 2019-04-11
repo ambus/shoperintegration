@@ -33,7 +33,7 @@ export class FileWatcher {
       this.watchFile(filePath)
         .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
         .subscribe((path: string) => {
-          this.ifChangeWasInWatchFileReadThem(path, `${filePath}/${fileName}`);
+          if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, this.$dataFromFileStream);
         });
       this.watchingFile = `${filePath}${fileName}`;
     } catch (err) {
@@ -58,17 +58,19 @@ export class FileWatcher {
   }
 
   public readFile(filePath: string): Observable<string> {
-    return Observable.create((function (observer: AnonymousSubject<string>) {
-      fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
-        if (err) {
-          this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-          observer.error(err);
-        }
-        this.logger.info(`Odczytano nowe dane:`, data);
-        observer.next(data);
-        observer.complete();
-      });
-    }).bind(this))
+    return Observable.create(
+      function(observer: AnonymousSubject<string>) {
+        fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
+          if (err) {
+            this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
+            observer.error(err);
+          }
+          this.logger.info(`Odczytano nowe dane:`, data);
+          observer.next(data);
+          observer.complete();
+        });
+      }.bind(this)
+    );
   }
 
   public deleteFile(filepath: string): void {
@@ -88,18 +90,7 @@ export class FileWatcher {
     return sub;
   }
 
-  public ifChangeWasInWatchFileReadThem(path: string, filePathToWatch: string): void {
-    this.logger.info(
-      `Został zmodyfikowany plik ${path.toLowerCase()} w katalogu ${filePathToWatch.toLowerCase()}. Który ${
-        path.toLowerCase() === `${filePathToWatch}`.toLowerCase() ? "spełnia warunek" : "nie spełnia warunku"
-      }`
-    );
-    if (path.toLowerCase() === `${filePathToWatch}`.toLowerCase()) {
-      try {
-        this.readFileAndSendThemToStream(`${path}`);
-      } catch (err) {
-        this.logger.error(`Napotkano błąd podczas próby odczytania pliku ${filePathToWatch}`, err);
-      }
-    }
+  public changesHaveOccurredInTheObservableFile(path: string, filePathToWatch: string): boolean {
+    return !!(path.toLowerCase() === `${filePathToWatch}`.toLowerCase());
   }
 }
