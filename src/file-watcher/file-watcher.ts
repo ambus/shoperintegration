@@ -28,7 +28,7 @@ export class FileWatcher {
     this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
     try {
       if (readOnStart) {
-        this.readFileAndSendThemToStream(`${filePath}${fileName}`);
+        this.readFileAndSendThemToStream(`${filePath}${fileName}`, this.$dataFromFileStream);
       }
       this.watchFile(filePath)
         .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
@@ -47,27 +47,14 @@ export class FileWatcher {
     return !!(this.watchingFile && this.watchingFile.length > 0);
   }
 
-  public readFileAndSendThemToStream(filePath: string): Promise<void> {
-    this.logger.debug(`Próba odczytania pliku ${filePath}`);
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (fs.existsSync(filePath)) {
-          this.readFile(filePath)
-            .pipe(
-              tap(val => this.logger.info("Odczytano nowe dane")),
-              retry(5),
-              tap(() => this.deleteFile(filePath))
-            )
-            .subscribe((res: string) => this.$dataFromFileStream.next(res), (err: any) => this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err));
-        } else {
-          this.logger.debug(`Plik ${filePath} nie istnieje`);
-        }
-        resolve();
-      } catch (err) {
-        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}`, err);
-        reject(err);
-      }
-    });
+  public readFileAndSendThemToStream(filePath: string, stream: Subject<string>): void {
+    this.readFile(filePath)
+      .pipe(
+        tap(val => this.logger.info("Odczytano nowe dane")),
+        retry(5),
+        tap(() => this.deleteFile(filePath))
+      )
+      .subscribe((res: string) => stream.next(res), (err: any) => this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err));
   }
 
   public readFile(filePath: string): Observable<string> {
