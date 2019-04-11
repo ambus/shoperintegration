@@ -28,12 +28,12 @@ export class FileWatcher {
     this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
     try {
       if (readOnStart) {
-        this.readFileAndSendThemToStream(`${filePath}${fileName}`, this.$dataFromFileStream);
+        this.readFileAndSendThemToStream(`${filePath}/${fileName}`, this.$dataFromFileStream);
       }
       this.watchFile(filePath)
         .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
         .subscribe((path: string) => {
-          if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, this.$dataFromFileStream);
+          if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(`${filePath}/${fileName}`, this.$dataFromFileStream);
         });
       this.watchingFile = `${filePath}${fileName}`;
     } catch (err) {
