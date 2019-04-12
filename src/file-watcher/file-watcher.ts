@@ -16,25 +16,22 @@ export class FileWatcher {
   }
 
   public startWatch(filePath: string, fileName: string, readOnStart: boolean): Observable<string> {
-    return Observable.create(
-      function(observer: AnonymousSubject<string>) {
-        this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
-        try {
-          if (readOnStart) {
-            this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
-          }
-          this.watchFile(filePath)
-            .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
-            .subscribe((path: string) => {
-              if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
-            });
-        } catch (err) {
-          this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie strumienia`, err);
-          this.watchingFile = undefined;
-          observer.error(err);
+    return Observable.create((observer: AnonymousSubject<string>) => {
+      this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
+      try {
+        if (readOnStart) {
+          this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
         }
-      }.bind(this)
-    );
+        this.watchFile(filePath)
+          .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
+          .subscribe((path: string) => {
+            if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
+          });
+      } catch (err) {
+        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie strumienia`, err);
+        observer.error(err);
+      }
+    });
   }
 
   public readFileAndSendThemToStream(filePath: string, stream: Subject<string>): void {
@@ -48,19 +45,17 @@ export class FileWatcher {
   }
 
   public readFile(filePath: string): Observable<string> {
-    return Observable.create(
-      function(observer: AnonymousSubject<string>) {
-        fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
-          if (err) {
-            this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-            observer.error(err);
-          }
-          this.logger.info(`Odczytano nowe dane:`, data);
-          observer.next(data);
-          observer.complete();
-        });
-      }.bind(this)
-    );
+    return Observable.create((observer: AnonymousSubject<string>) => {
+      fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
+        if (err) {
+          this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
+          observer.error(err);
+        }
+        this.logger.info(`Odczytano nowe dane:`, data);
+        observer.next(data);
+        observer.complete();
+      });
+    });
   }
 
   public deleteFile(filepath: string): void {
