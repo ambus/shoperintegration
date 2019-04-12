@@ -1,5 +1,5 @@
 import { getLogger, Logger } from "log4js";
-import { Observable, Subject, throwError } from "rxjs";
+import { Observable, Subject, throwError, of } from "rxjs";
 import { tap, retry, finalize } from "rxjs/operators";
 
 import * as fs from "fs";

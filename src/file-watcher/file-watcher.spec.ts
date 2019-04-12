@@ -1,14 +1,11 @@
 import { FileWatcher } from "./file-watcher";
 import { Observable, Subject } from "rxjs";
-const path = require("path");
-const mock = require("mock-fs");
 import * as fs from "fs";
 import { stringGenerator } from "../lib/string-generator";
 import { Config } from "../config/config";
 import { CONFIG_FILE_NAME } from "../index";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 
-const TEST_FILE_PATH = "test.csv";
 const EXAMPLE_DATA = `product_code;stock;price
 BUKWT2010;  41;110,0
 BSZK0F1FLE051;   3;139,57
