@@ -1,10 +1,8 @@
 import { getLogger, Logger } from "log4js";
-import { Observable, Subject, throwError, of } from "rxjs";
-import { tap, retry, finalize } from "rxjs/operators";
-
+import { Observable, Subject } from "rxjs";
+import { tap, retry } from "rxjs/operators";
 import * as fs from "fs";
-import { FSWatcher, watch } from "chokidar";
-
+import { watch } from "chokidar";
 import { Config } from "../config/config";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 
