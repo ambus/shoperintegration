@@ -43,18 +43,6 @@ describe("FileWatcher", () => {
     expect(fileWatcher.startWatch).toBeDefined();
   });
 
-  it("powinien istnieć strumień z przychodzącymi danymi - do którego można się podpiąć", () => {
-    expect(fileWatcher.streamWithDataInsertedToWatchingFile).toBeDefined();
-    let stream = fileWatcher.streamWithDataInsertedToWatchingFile;
-    expect(stream instanceof Observable).toBeTruthy();
-  });
-
-  it("można pobrać informację czy plik jest obserwowany", () => {
-    expect(fileWatcher.isWatching).toBeFalsy();
-    fileWatcher.startWatch("tmp", TEST_FILE_PATH, true);
-    expect(fileWatcher.isWatching).toBeTruthy();
-  });
-
   it("powinna zwrócić przeczytane dane", async done => {
     new FileWatcher().readFile("./tmp/test3.csv").subscribe(
       (res: string) => {
@@ -162,23 +150,30 @@ describe("FileWatcher", () => {
     fs.writeFileSync(`tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
   });
 
-  it("startWatch powinien zwracać strumień", () => {});
-  it("startWatch w przypadku napotkania błędu powinien zwrócić Observable.error i przerwać obserowanie plików", () => {
-    // let fileName = `${stringGenerator()}.csv`;
-    // let fw = new FileWatcher();
-    // spyOn(fw, "readFileAndSendThemToStream").and.callFake(function() {
-    //   throw new Error("Błąd odczytu");
-    // });
-    // spyOn(fw.logger, "error").and.callFake(function(obj: any) {
-    //   expect(obj).toContain(`Napotkano błąd podczas odczytu pliku ./tmp/${fileName}`);
-    // });
-    // try {
-    //   fw.startWatch("./tmp/", fileName, true);
-    // } catch (err) {
-    //   expect(err.name).toEqual("Error");
-    //   expect(err.message).toEqual("Błąd odczytu");
-    //   done();
-    // }
+  it("startWatch powinien zwracać strumień", () => {
+    let fw = new FileWatcher();
+    let fileName = `${stringGenerator()}.csv`;
+    expect(fw.startWatch("tmp", fileName, false)).toBeDefined();
+  });
+  it("startWatch w przypadku napotkania błędu powinien zwrócić Observable.error i przerwać obserowanie plików", done => {
+    let fileName = `${stringGenerator()}.csv`;
+    let fw = new FileWatcher();
+    spyOn(fw, "readFileAndSendThemToStream").and.callFake(function() {
+      throw new Error("Błąd odczytu");
+    });
+    spyOn(fw.logger, "error").and.callFake(function(obj: any) {
+      expect(obj).toContain(`Napotkano błąd podczas odczytu pliku ./tmp/${fileName}`);
+    });
+    fw.startWatch("./tmp/", fileName, true).subscribe(
+      (data: string) => {
+        expect(false).toBeTruthy();
+      },
+      (err: any) => {
+        expect(err.name).toEqual("Error");
+        expect(err.message).toEqual("Błąd odczytu");
+        done();
+      }
+    );
   });
 
   it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku podczas uruchamiania obserwowania", done => {
@@ -187,12 +182,11 @@ describe("FileWatcher", () => {
     if (fs.existsSync(`./tmp/${fileName}`)) {
       fs.unlinkSync(`./tmp/${fileName}`);
     }
-    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+    fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
+    fw.startWatch("./tmp", fileName, true).subscribe((data: string) => {
       expect(data).toEqual(EXAMPLE_DATA);
       done();
     });
-    fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
-    fw.startWatch("./tmp/", fileName, true);
   });
 
   it("powinien usunąć plik z danymi po przeczytaniu ich", done => {
@@ -202,13 +196,12 @@ describe("FileWatcher", () => {
     if (fs.existsSync(`./tmp/${fileName}`)) {
       fs.unlinkSync(`./tmp/${fileName}`);
     }
-    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+    fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
+    fw.startWatch("./tmp/", fileName, true).subscribe((data: string) => {
       expect(data).toEqual(EXAMPLE_DATA);
       expect(fs.existsSync(`./tmp/${fileName}`)).toBeFalsy();
       done();
     });
-    fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
-    fw.startWatch("./tmp/", fileName, true);
   });
 
   it("po zmianie danych w pliku powinny pojawić się one w strumieniu", done => {
@@ -216,7 +209,7 @@ describe("FileWatcher", () => {
     let fw = new FileWatcher();
     let counter = 0;
 
-    fw.streamWithDataInsertedToWatchingFile.subscribe((data: string) => {
+    fw.startWatch(`tmp`, fileName, true).subscribe((data: string) => {
       if (counter === 0) {
         expect(data).toEqual("");
         counter += 1;
@@ -226,7 +219,6 @@ describe("FileWatcher", () => {
         done();
       }
     });
-    fw.startWatch(`tmp`, fileName, true);
     fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
   });
 });
