@@ -21,5 +21,13 @@
       }
     }
   },
-  "encoding": "utf8"
+  "encoding": "utf8",
+  "parserOptions": {
+    "delimiter": ";",
+    "columns": true,
+    "skip_empty_lines": true,
+    "skip_lines_with_error": true,
+    "trim": true,
+    "cast": true
+  }
 }
