@@ -5,6 +5,6 @@ export type ConfigElement = {
     log4js: Configuration;
     encoding: string;
     configurationType: string;
-    parseOptions: ParserOptions
+    parserOptions: ParserOptions
 
 }
