@@ -1,7 +1,6 @@
 import { parseCSVDataToFilonMerchandise, logger } from "./csv-parser";
 import { Config } from "../config/config";
 import { FilonMerchandise } from "../models/filon-merchandise";
-import parse = require("csv-parse/lib/sync");
 
 const DATA_WITH_ERROR = `
 product_code; srower,sdfasdkfj,asdfkj
@@ -27,9 +26,8 @@ var config: Config;
 
 beforeAll(function() {
   config = Config.getInstance();
-
-    spyOn(logger, "debug").and.callFake(function(obj: any) {});
-    spyOn(logger, "error").and.callFake(function(obj: any) {});
+  spyOn(logger, "debug").and.callFake(function(obj: any) {});
+  spyOn(logger, "error").and.callFake(function(obj: any) {});
 });
 
 describe("CSVParser", () => {
@@ -62,7 +60,6 @@ describe("CSVParser", () => {
 
   it("w cenach zamiast przecinka powinny pojawić się kropki", () => {
     let merchandises = parseCSVDataToFilonMerchandise(OK_DATA, config.parserOptions);
-    // merchandises = parseCSVDataToFilonMerchandise(merchandises, config.parserOptions);
     merchandises.forEach((merchandise: FilonMerchandise) => {
       expect(Number(merchandise.price)).not.toBeNaN();
     });
