@@ -28,9 +28,8 @@ function firstoObjectHavaAlleRequiredField(merchandise: FilonMerchandise[]): boo
 }
 
 function replaceCommaInFilonMerchandisesPrices(merchandise: FilonMerchandise[]): FilonMerchandise[] {
-  merchandise.map((merchandise: FilonMerchandise) => {
-    merchandise.price = merchandise.price.replace(",", ".");
-    merchandise.priceE = merchandise.priceE.replace(",", ".");
+  merchandise.map((mer: FilonMerchandise) => {
+    mer.price = mer.price.replace(",", ".");
   });
   logger.debug(`Dane po zamienie przecinków na kropki:`, merchandise);
   return merchandise;
