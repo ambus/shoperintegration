@@ -1,18 +1,15 @@
 import { getLogger } from "log4js";
 import { FilonMerchandise } from "../models/filon-merchandise";
-import { Config } from "../config/config";
 import parse = require("csv-parse/lib/sync");
+import { ParserOptions } from "../models/parser-options";
 
 const PARSE_ERROR = "Napotkano błąd podczas parsowania otrzymanych danych! Prawdopodobnie jest błąd w strukturze stringa";
 
-const logger = getLogger();
-
-this.logger = getLogger();
-export function parseCSVDataToFilonMerchandise(dataToParse: string, config: Config): FilonMerchandise[] {
+export function parseCSVDataToFilonMerchandise(dataToParse: string, config: ParserOptions): FilonMerchandise[] {
   let parsedMerchandiseArray: FilonMerchandise[] = [];
   logger.debug("Dane do parsowania: ", dataToParse);
   try {
-    parsedMerchandiseArray = replaceCommaInFilonMerchandisesPrices(parse(dataToParse, config.parserOptions));
+    parsedMerchandiseArray = replaceCommaInFilonMerchandisesPrices(parse(dataToParse, config));
 
     if (firstoObjectHavaAlleRequiredField(parsedMerchandiseArray)) {
       logger.error("Dane przekazane do parsowania niestety nie posiadają wymaganych pól! Zwrócono pustą tablicę.");
@@ -36,6 +33,5 @@ function replaceCommaInFilonMerchandisesPrices(merchandise: FilonMerchandise[]):
     merchandise.priceE = merchandise.priceE.replace(",", ".");
   });
   logger.debug(`Dane po zamienie przecinków na kropki:`, merchandise);
-
   return merchandise;
 }
