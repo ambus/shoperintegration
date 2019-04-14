@@ -11,7 +11,7 @@ export function parseCSVDataToFilonMerchandise(dataToParse: string, config: Pars
   try {
     parsedMerchandiseArray = replaceCommaInFilonMerchandisesPrices(parse(dataToParse, config));
 
-    if (firstoObjectHavaAlleRequiredField(parsedMerchandiseArray)) {
+    if (!firstoObjectHavaAlleRequiredField(parsedMerchandiseArray)) {
       logger.error("Dane przekazane do parsowania niestety nie posiadają wymaganych pól! Zwrócono pustą tablicę.");
       return [];
     }
@@ -24,7 +24,7 @@ export function parseCSVDataToFilonMerchandise(dataToParse: string, config: Pars
 }
 
 function firstoObjectHavaAlleRequiredField(merchandise: FilonMerchandise[]): boolean {
-  return merchandise.length > 0 && (typeof merchandise[0].product_code === "undefined" || typeof merchandise[0].price === "undefined" || typeof merchandise[0].stock === "undefined");
+  return merchandise.length > 0 && typeof merchandise[0].product_code !== "undefined" && typeof merchandise[0].price !== "undefined" && typeof merchandise[0].stock !== "undefined";
 }
 
 function replaceCommaInFilonMerchandisesPrices(merchandise: FilonMerchandise[]): FilonMerchandise[] {
