@@ -17,7 +17,7 @@ export function parseCSVDataToFilonMerchandise(dataToParse: string, config: Pars
     }
   } catch (err) {
     logger.error("Podczas parsowania danych napotkano błąd", err);
-    throw new Error(PARSE_ERROR);
+    return [];
   }
   logger.debug(`Parsowanie zakończyło się powodzeniem. Odczytano ${parsedMerchandiseArray.length} towarów. Dane po parsowaniu:`, parsedMerchandiseArray);
   return parsedMerchandiseArray;
