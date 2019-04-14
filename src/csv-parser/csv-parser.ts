@@ -3,7 +3,7 @@ import { FilonMerchandise } from "../models/filon-merchandise";
 import parse = require("csv-parse/lib/sync");
 import { ParserOptions } from "../models/parser-options";
 
-const PARSE_ERROR = "Napotkano błąd podczas parsowania otrzymanych danych! Prawdopodobnie jest błąd w strukturze stringa";
+export const logger = getLogger();
 
 export function parseCSVDataToFilonMerchandise(dataToParse: string, config: ParserOptions): FilonMerchandise[] {
   let parsedMerchandiseArray: FilonMerchandise[] = [];
