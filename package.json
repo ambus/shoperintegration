@@ -1,6 +1,6 @@
 {
   "name": "shoperintegration",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Service to integration shoper online shop with local data.",
   "main": "./src/index.js",
   "repository": "git@github.com:ambus/shoperintegration.git",
