@@ -1,20 +1,25 @@
 // import * as index from "./index";
 // import { init, config, logger, loadDefaultConfiguration, CONFIG_FILE_NAME } from "./index";
-var Index;
+import { stringGenerator } from "./lib/string-generator";
+import { Config } from "./config/config";
+import { Index, IndexType } from "./index";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
+
+
+beforeAll(() => {
+  spyOn(console, "error");
+  Config.getInstance(TEST_CONFIG_FILE_PATH);
+  spyOn(Index.logger, "trace");
+})
 
 describe("Index", () => {
-  beforeAll(() => {
-    Index = undefined;
-    Index = require("./index");
-  });
-
   it("powinien zawierać funkcję inicjującą", done => {
     expect(Index.init).toBeDefined();
     done();
   });
 
   it("powinien zawierać instancję loggera", done => {
-    Index.init();
+    Index.init("tmp/testConfig.json");
     expect(Index.logger).toBeDefined();
     done();
   });
@@ -34,5 +39,9 @@ describe("Index", () => {
     expect(Index.config.configurationType).toContain(Index.CONFIG_FILE_NAME);
     done();
   });
-});
 
+  // it("", done => {
+  //   Index.init("tmp/testConfig.json");
+  //   expect(Index.config.fileInfo.fileName).toContain("test.csv");
+  // });
+});

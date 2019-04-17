@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "test-coverage": "NODE_ENV=development jest --coverage",
-    "test": "NODE_ENV=development jest --watch",
+    "test": "NODE_ENV=development jest --watch --verbose",
     "test:console": "NODE_ENV=development jest --watch --verbose false",
     "build": "webpack",
     "build-type-script": "tsc",

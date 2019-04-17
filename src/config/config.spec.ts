@@ -1,12 +1,12 @@
 import { Config } from "./config";
 import * as fs from "fs";
 
-const TEST_CONFIG_FILE_PATH = "config.json";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 describe("Konfiguracja", () => {
   var config: Config;
   beforeAll(() => {
-    config = Config.getInstance();
+    config = Config.getInstance(TEST_CONFIG_FILE_PATH);
   });
 
   test("w konfiguracji powinien znajdować się obiekt log4js z konfiguracją dla loggiera", done => {
@@ -24,7 +24,7 @@ describe("Konfiguracja", () => {
     const newInfo = "New info data";
     expect(config.configurationType).not.toEqual(newInfo);
     config.configurationType = newInfo;
-    let configV2 = Config.getInstance();
+    let configV2 = Config.getInstance(TEST_CONFIG_FILE_PATH);
     expect(configV2.configurationType).toEqual(newInfo);
     done();
   });
@@ -35,14 +35,15 @@ describe("Konfiguracja - domyślne wartości", () => {
 
   beforeAll(() => {
     fs.renameSync(TEST_CONFIG_FILE_PATH, `test${TEST_CONFIG_FILE_PATH}`);
+    spyOn(console, "error");
     config = Config.getInstance(TEST_CONFIG_FILE_PATH + "fff");
   });
 
-  test("jeśli plik z konfiguracją nie istnieje lub zawiera błędy powinna zostać załadowana domyślna konfiguracja", done => {
+  it("jeśli plik z konfiguracją nie istnieje lub zawiera błędy powinna zostać załadowana domyślna konfiguracja", done => {
     expect(config).toBeDefined();
     expect(config.log4js).toBeDefined();
     expect(config.configurationType).toEqual("default");
-    expect(config.encoding).toEqual('utf8');
+    expect(config.encoding).toEqual("utf8");
     done();
   });
   afterAll(() => {
