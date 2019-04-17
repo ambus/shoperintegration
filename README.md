@@ -1,7 +1,7 @@
 # shoperintegration ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/ambus/shoperintegration.svg?style=for-the-badge)
 Service to integration shoper online shop with local data.
 
-Shoperintergration must communicate with the old DOS app. Communication will be done through changes to txt files.
+Shoperintergration must communicate with the old DOS app. Communication will be done through changes on txt files.
 
 ### TODO
 * [X] add logger to file
@@ -13,7 +13,7 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
     - [X] watchFile
 * [X] add converter csv string to javascript object
 * [ ] run fileWatcher on index.js
-* [ ] add tokenGenerator function
+* [X] add tokenGenerator function
 * [ ] add service to get token from shoper api
 * [ ] add https://circleci.com/
 * [ ] add https://codecov.io/
