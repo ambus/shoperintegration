@@ -1,47 +1,35 @@
-// import * as index from "./index";
-// import { init, config, logger, loadDefaultConfiguration, CONFIG_FILE_NAME } from "./index";
-import { stringGenerator } from "./lib/string-generator";
-import { Config } from "./config/config";
-import { Index, IndexType } from "./index";
+import { Index } from "./index";
 const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
+var index: Index;
 
 beforeAll(() => {
   spyOn(console, "error");
-  Config.getInstance(TEST_CONFIG_FILE_PATH);
-  spyOn(Index.logger, "trace");
-})
+  index = new Index(TEST_CONFIG_FILE_PATH);
+  spyOn(index.logger, "trace").and.callFake(() => {});
+  spyOn(index.logger, "debug").and.callFake(() => {});
+});
 
 describe("Index", () => {
-  it("powinien zawierać funkcję inicjującą", done => {
-    expect(Index.init).toBeDefined();
-    done();
-  });
-
   it("powinien zawierać instancję loggera", done => {
-    Index.init("tmp/testConfig.json");
-    expect(Index.logger).toBeDefined();
+    expect(index.logger).toBeDefined();
     done();
   });
 
   it("index.ts powinien zawierać załadowaną konfigurację z pliku config.json", done => {
-    expect(Index.config).toBeDefined();
+    expect(index.config).toBeDefined();
     done();
   });
 
   it("w konfiguracji powinien znajdować się obiekt log4js z konfiguracją dla loggiera", done => {
-    expect(Index.config.log4js).toBeDefined();
+    expect(index.config.log4js).toBeDefined();
     done();
   });
 
   it("typ konfiguracji powinien wskazywać na plik", done => {
-    expect(Index.config.configurationType).toBeDefined();
-    expect(Index.config.configurationType).toContain(Index.CONFIG_FILE_NAME);
+    expect(index.config.configurationType).toBeDefined();
+    expect(index.config.configurationType).toContain(TEST_CONFIG_FILE_PATH);
     done();
   });
 
-  // it("", done => {
-  //   Index.init("tmp/testConfig.json");
-  //   expect(Index.config.fileInfo.fileName).toContain("test.csv");
-  // });
 });
