@@ -38,8 +38,9 @@ export class Index {
       //   )
       // )
     )
-    // .subscribe((data: string) => {
-    //   //TODO podpiąć czytanie danych
-    // });
+    .subscribe((data: string) => {
+      //TODO podpiąć czytanie danych
+    },
+    err => {});
   }
 }
