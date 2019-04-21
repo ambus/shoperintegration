@@ -1,10 +1,6 @@
 var path = require("path");
+var nodeExternals = require('webpack-node-externals');
 
-var Webpack = require('webpack');
-var path = require('path');
-var fs = require('fs');
-
-var nodeModules = {};
 module.exports = {
   mode: "production",
   devtool: "source-map",
@@ -13,7 +9,7 @@ module.exports = {
   resolve: {
     extensions: [".webpack.js", ".web.js", ".ts", ".js", ".json"]
   },
-  externals: nodeModules,
+  externals: [nodeExternals()],
   module: {
     exprContextRegExp: /$^/,
     exprContextCritical: false,
@@ -27,6 +23,7 @@ module.exports = {
   output: {
     publicPath:'',
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "dist"),
+    libraryTarget: 'commonjs2'
   }
 };

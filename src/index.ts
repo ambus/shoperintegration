@@ -10,6 +10,8 @@ export class Index {
   logger: Logger;
   config: Config;
   fw: FileWatcher = new FileWatcher();
+  readFileOnStart: boolean = true;
+
   constructor(configFileName: string) {
     this.init(configFileName);
     this.fw = new FileWatcher();
@@ -22,12 +24,24 @@ export class Index {
     this.logger.debug("Start serwisu shoperintergration");
   }
 
-  retryPipeline =
-    retryWhen(errors => errors.pipe(concatMap((e, i) => iif(() => i > this.config.attempsWhenError, throwError(e), of(e).pipe(delay(this.config.errorDelayTime))))));
+  retryPipeline = retryWhen(errors =>
+    errors.pipe(
+      concatMap((e, i) =>
+        iif(
+          () => i > this.config.attempsWhenError,
+          throwError(e),
+          of(e).pipe(
+            tap(val => (this.readFileOnStart = false)),
+            delay(this.config.errorDelayTime)
+          )
+        )
+      )
+    )
+  );
 
   startWatchFile(): void {
     this.fw
-      .startWatch(this.config.fileInfo.path, this.config.fileInfo.fileName, true)
+      .startWatch(this.config.fileInfo.path, this.config.fileInfo.fileName, this.readFileOnStart)
       .pipe(
         tap(val => this.logger.debug("Nowe dane w strumieniu", val)),
         this.retryPipeline
