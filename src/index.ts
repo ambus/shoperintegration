@@ -51,3 +51,5 @@ export class Index {
     console.warn("TODO send parsed data do shoper");
   }
 }
+
+// new Index(CONFIG_FILE_NAME).startWatchFile();

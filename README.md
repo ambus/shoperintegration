@@ -12,8 +12,9 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
     - [X] deleteFile
     - [X] watchFile
 * [X] add converter csv string to javascript object
-* [ ] run fileWatcher on index.js
+* [X] run fileWatcher on index.js
 * [X] add tokenGenerator function
+* [ ] repair webpack build
 * [ ] add service to get token from shoper api
 * [ ] add https://circleci.com/
 * [ ] add https://codecov.io/
