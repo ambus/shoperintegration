@@ -15,6 +15,7 @@ export class Config {
   public parserOptions: ParserOptions;
   public fileInfo: FileInfo;
   public errorDelayTime: number;
+  public attempsWhenError: number;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -38,6 +39,7 @@ export class Config {
       this.parserOptions = config.parserOptions;
       this.fileInfo = config.fileInfo;
       this.errorDelayTime = config.errorDelayTime;
+      this.attempsWhenError = config.attempsWhenError;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
@@ -47,6 +49,7 @@ export class Config {
       this.parserOptions = config.parserOptions;
       this.fileInfo = config.fileInfo;
       this.errorDelayTime = config.errorDelayTime;
+      this.attempsWhenError = config.attempsWhenError;
     }
   }
 
@@ -74,7 +77,8 @@ export class Config {
         path: "tmp",
         fileName: "test.csv"
       },
-      errorDelayTime: 5000
+      errorDelayTime: 5000,
+      attempsWhenError: 5
     };
   }
 }

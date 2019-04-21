@@ -30,8 +30,9 @@
         "cast": true
     },
     "fileInfo": {
-        "path": "../tmp",
+        "path": "tmp",
         "fileName": "test4.csv"
     },
-    "errorDelayTime": 5000
+    "errorDelayTime": 50,
+    "attempsWhenError": 5
 }

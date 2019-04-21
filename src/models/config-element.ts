@@ -9,4 +9,5 @@ export type ConfigElement = {
     parserOptions: ParserOptions
     fileInfo: FileInfo;
     errorDelayTime: number;
+    attempsWhenError: number
 }
