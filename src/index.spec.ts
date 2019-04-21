@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { stringGenerator } from "./lib/string-generator";
 import { Observable } from "rxjs";
 import { AnonymousSubject } from "rxjs/internal/Subject";
+import { retryWhen } from "rxjs/operators";
 
 var index: Index;
 const EXAMPLE_DATA = `product_code;stock;price
@@ -67,12 +68,26 @@ describe("Index", () => {
     spyOn(index2.fw, "readFile").and.callFake(function(obj: {}) {
       return Observable.create((observer: AnonymousSubject<string>) => {
         index++;
-        if (index >= index2.config.attempsWhenError ) {
+        if (index >= index2.config.attempsWhenError) {
           done();
         }
         observer.error(new Error("Napotkano błąd podczas próby odczytu pliku"));
       });
     });
     index2.startWatchFile();
+  });
+
+  it("retryWhen gdy napotka błędy powinien próbowac podjąć ponowną próbe subskrybcji określoną ilość razy z przerwą określoną w konfiguracji", done => {
+    let index = 0;
+    let index2: Index;
+    index2 = new Index(TEST_CONFIG_FILE_PATH);
+    let obser = Observable.create((observer: AnonymousSubject<string>) => {
+      if (index >= index2.config.attempsWhenError) {
+        done();
+      }
+      index++;
+      observer.error(new Error("Napotkano błąd podczas próby odczytu pliku"));
+    });
+    obser.pipe(index2.retryPipeline).subscribe((data: any) => {}, err => {});
   });
 });

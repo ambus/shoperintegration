@@ -22,22 +22,15 @@ export class Index {
     this.logger.debug("Start serwisu shoperintergration");
   }
 
+  retryPipeline =
+    retryWhen(errors => errors.pipe(concatMap((e, i) => iif(() => i > this.config.attempsWhenError, throwError(e), of(e).pipe(delay(this.config.errorDelayTime))))));
+
   startWatchFile(): void {
     this.fw
       .startWatch(this.config.fileInfo.path, this.config.fileInfo.fileName, true)
       .pipe(
         tap(val => this.logger.debug("Nowe dane w strumieniu", val)),
-        retryWhen(errors =>
-          errors.pipe(
-            concatMap((e, i) =>
-              iif(
-                () => i > this.config.attempsWhenError,
-                throwError(e),
-                of(e).pipe(delay(this.config.errorDelayTime))
-              )
-            )
-          )
-        )
+        this.retryPipeline
       )
       .subscribe(
         (data: string) => {
