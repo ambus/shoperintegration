@@ -10,6 +10,8 @@ export class Index {
   logger: Logger;
   config: Config;
   fw: FileWatcher = new FileWatcher();
+  readFileOnStart: boolean = true;
+
   constructor(configFileName: string) {
     this.init(configFileName);
     this.fw = new FileWatcher();
