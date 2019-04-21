@@ -56,3 +56,6 @@ src/styles.css
 
 # log4js
 /log4js
+
+# config
+config.json
