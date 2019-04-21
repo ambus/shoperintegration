@@ -11,7 +11,7 @@ export class FileWatcher {
   private config: Config;
 
   constructor() {
-    this.logger = getLogger();
+    this.logger = getLogger('fileWatcher');
     this.config = Config.getInstance();
   }
 

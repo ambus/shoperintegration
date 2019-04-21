@@ -3,7 +3,7 @@ import { Observable, Subject } from "rxjs";
 import * as fs from "fs";
 import { stringGenerator } from "../lib/string-generator";
 import { Config } from "../config/config";
-import { CONFIG_FILE_NAME } from "../index";
+import { Index } from "../index";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 
 const EXAMPLE_DATA = `product_code;stock;price
@@ -14,7 +14,7 @@ BSZK0IZMWAS02;   2;16,00
 ICAZG10KLD;  42;120,0`;
 
 beforeAll(() => {
-  Config.getInstance(CONFIG_FILE_NAME);
+  Config.getInstance('configForTests.json');
 });
 
 describe("FileWatcher", () => {

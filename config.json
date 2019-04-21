@@ -29,5 +29,10 @@
     "skip_lines_with_error": true,
     "trim": true,
     "cast": true
-  }
+  },
+  "fileInfo": {
+    "path": "tmp",
+    "fileName": "test.csv"
+  },
+  "errorDelayTime": 5000
 }

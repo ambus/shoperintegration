@@ -22,10 +22,12 @@ BSZK0IZMWAS02;   1;16,00
 SBARDC22;   6;824,10
 `;
 
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
+
 var config: Config;
 
 beforeAll(function() {
-  config = Config.getInstance();
+  config = Config.getInstance(TEST_CONFIG_FILE_PATH);
   spyOn(logger, "debug").and.callFake(function(obj: any) {});
   spyOn(logger, "error").and.callFake(function(obj: any) {});
 });

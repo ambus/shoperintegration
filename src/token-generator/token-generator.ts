@@ -1,3 +1,3 @@
 export function getToken(login: string = "", password: string = ""): string {
-  return new Buffer(`${login}:${password}`).toString("base64");
+  return Buffer.from(`${login}:${password}`).toString("base64");
 }
