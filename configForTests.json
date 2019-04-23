@@ -36,9 +36,11 @@
     "errorDelayTime": 50,
     "attempsWhenError": 5,
     "shoperConfig": {
-        "token": "",
-        "productStocks": "",
-        "products": ""
-    },
-    "userToken": ""
+        "urls": {
+            "token": "",
+            "productStocks": "",
+            "products": ""
+        },
+        "userToken": ""
+    }
 }
