@@ -34,5 +34,13 @@
         "fileName": "test4.csv"
     },
     "errorDelayTime": 50,
-    "attempsWhenError": 5
+    "attempsWhenError": 5,
+    "shoperConfig": {
+        "urls": {
+            "token": "",
+            "productStocks": "",
+            "products": ""
+        },
+        "userToken": ""
+    }
 }

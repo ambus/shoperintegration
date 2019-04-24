@@ -1,6 +1,7 @@
 import { Configuration } from "log4js";
 import { ParserOptions } from "./parser-options";
 import { FileInfo } from "./file-info";
+import { ShoperConfig } from "./shoper-config";
 
 export type ConfigElement = {
     log4js: Configuration;
@@ -9,5 +10,6 @@ export type ConfigElement = {
     parserOptions: ParserOptions
     fileInfo: FileInfo;
     errorDelayTime: number;
-    attempsWhenError: number
+    attempsWhenError: number;
+    shoperConfig: ShoperConfig
 }
