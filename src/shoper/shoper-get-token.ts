@@ -8,18 +8,15 @@ import { XMLHttpRequest } from "xmlhttprequest";
 export class ShoperGetToken {
   public static authorizationToken: string;
 
-  public static retryPipeline = retryWhen(errors =>
-    errors.pipe(concatMap((e, i) => iif(() => i > Config.getInstance().attempsWhenError, throwError(e), of(e).pipe(delay(Config.getInstance().errorDelayTime)))))
-  );
+  // public static retryPipeline = retryWhen(errors =>
+  //   errors.pipe(concatMap((e, i) => iif(() => i > Config.getInstance().attempsWhenError, throwError(e), of(e).pipe(delay(Config.getInstance().errorDelayTime)))))
+  // );
 
-  static createXHR() {
+  static createXHR = function(){
     return new XMLHttpRequest();
   }
 
-  public static getToken(userToken: string, refreshToken: boolean = true): Observable<string> {
-    function createXHR() {
-      return new XMLHttpRequest();
-    }
+  public static getToken(userToken: string, refreshToken: boolean = true, createXHR: XMLHttpRequest = ShoperGetToken.createXHR): Observable<string> {
     if (refreshToken || !this.authorizationToken) {
       return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } }).pipe(
         tap((token: AjaxResponse) => console.warn(token.response)),
