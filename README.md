@@ -15,7 +15,8 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
 * [X] run fileWatcher on index.js
 * [X] add tokenGenerator function
 * [X] repair webpack build
-* [ ] add service to get token from shoper api
+* [X] add service to get token from shoper api
+* [ ] add shoperStock service
 * [ ] add https://circleci.com/
 * [ ] add https://codecov.io/
 * [ ] add info about version on tag (like lazygit repo)
