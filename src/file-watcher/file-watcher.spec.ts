@@ -3,7 +3,6 @@ import { Observable, Subject } from "rxjs";
 import * as fs from "fs";
 import { stringGenerator } from "../lib/string-generator";
 import { Config } from "../config/config";
-import { Index } from "../index";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 
 const EXAMPLE_DATA = `product_code;stock;price
@@ -14,7 +13,7 @@ BSZK0IZMWAS02;   2;16,00
 ICAZG10KLD;  42;120,0`;
 
 beforeAll(() => {
-  Config.getInstance('configForTests.json');
+  Config.getInstance("configForTests.json");
 });
 
 describe("FileWatcher", () => {
@@ -29,7 +28,7 @@ describe("FileWatcher", () => {
   });
 
   it("powinan zostać zainicjowana konfiguracja", () => {
-    expect(Config.getInstance()).toHaveProperty("encoding");
+    expect(Config.getInstance()).toBeDefined();
   });
 
   it("powinien zawierać instancję loggera", () => {

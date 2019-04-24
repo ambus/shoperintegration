@@ -27,7 +27,7 @@
     "karma": "karma start"
   },
   "dependencies": {
-    "chokidar": "^2.1.2",
+    "chokidar": "^2.1.5",
     "csv-parse": "^4.3.4",
     "log4js": "^4.0.2",
     "node-fetch": "^2.3.0",
