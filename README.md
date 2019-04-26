@@ -17,8 +17,6 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
 * [X] repair webpack build
 * [X] add service to get token from shoper api
 * [ ] add shoperStock service
-* [ ] add https://circleci.com/
-* [ ] add https://codecov.io/
 * [ ] add info about version on tag (like lazygit repo)
 * [ ] more..
 
