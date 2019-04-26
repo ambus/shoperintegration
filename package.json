@@ -15,8 +15,9 @@
     "service"
   ],
   "scripts": {
-    "test-coverage": "NODE_ENV=development jest --coverage --verbose",
-    "test": "NODE_ENV=development jest --watch --verbose",
+    "test-coverage": "NODE_ENV=development jest --coverage",
+    "test": "NODE_ENV=development jest",
+    "test:watch": "NODE_ENV=development jest --watch",
     "test:console": "NODE_ENV=development jest --watch --verbose false",
     "build": "webpack",
     "build-type-script": "tsc",
@@ -56,6 +57,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "verbose": true,
     "testRegex": "src/.*.(test|spec).(jsx?|tsx?)$",
     "testEnvironment": "node",
     "moduleFileExtensions": [
