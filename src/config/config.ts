@@ -89,7 +89,8 @@ export class Config {
           productStocks: "",
           products: ""
         },
-        userToken: ""
+        userToken: "",
+        countOfTaskMakers: 1
       }
     };
   }

@@ -41,6 +41,7 @@
             "productStocks": "",
             "products": ""
         },
-        "userToken": ""
+        "userToken": "",
+        "countOfTaskMakers": 1
     }
 }
