@@ -58,7 +58,7 @@ export class Index {
       );
   }
   parseData(data: string): FilonMerchandise[] {
-    console.warn("TODO parse string to javascript opbject");
+    // console.warn("TODO parse string to javascript opbject");
 
     return undefined;
   }
