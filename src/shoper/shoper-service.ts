@@ -1,43 +1,45 @@
+import { getLogger, Logger } from "log4js";
+import { BehaviorSubject, Observable, OperatorFunction, Subject, zip } from "rxjs";
+import { delay, map, share, tap } from "rxjs/operators";
 import { Config } from "../config/config";
 import { FilonMerchandise } from "../models/filon-merchandise";
 import { Task } from "../models/task";
-import { Subject, Observable, OperatorFunction, of, merge, zip } from "rxjs";
-import { map, share, delay, tap, switchMap, mapTo, scan, startWith } from "rxjs/operators";
+import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { createTaskRequest } from "./utils/create-task-request";
 import { setStatus } from "./utils/set-status";
-import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 
 export class ShoperService {
+  logger: Logger;
+  filonMerchandiseAdd$: Subject<FilonMerchandise> = new Subject();
+  connectionPoolIsFree: Subject<boolean> = new BehaviorSubject(true);
+
   constructor(private config: Config) {
-    for (let index = 0; index < config.shoperConfig.countOfTaskMakers; index++) {
-      this.taskMakerCheckIn$.next();
-    }
+    this.logger = getLogger("ShoperService");
   }
 
-  filonMerchandiseAdd$: Subject<FilonMerchandise> = new Subject();
-  taskMakerCheckIn$: Subject<void> = new Subject();
-
-  _taskMaker$ = of(null).pipe(
-  );
+  addTask(filonMerchandise: FilonMerchandise): void {
+    this.filonMerchandiseAdd$.next(filonMerchandise);
+  }
 
   _taskRequest$: Observable<Task> = this.filonMerchandiseAdd$.pipe(
     map(createTaskRequest),
     share()
   );
 
-  makingTask$: Observable<Task> = this._taskRequest$.pipe(this.assignTaskMaker());
+  doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree).pipe(
+    map(([s, f]) => s),
+    delay(800),
+    setStatus(TaskShoperRequestStatusValue.making)
+    // this.makeTask(),
+  );
 
-  addTask(filonMerchandise: FilonMerchandise): void {
-    this.filonMerchandiseAdd$.next(filonMerchandise);
-  }
+  doneTask$: Observable<Task> = this.doingTask$.pipe(this.endTask$());
 
-  assignTaskMaker(): OperatorFunction<Task, Task> {
+  endTask$(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) =>
-      zip(source, this._taskMaker$).pipe(
-        map(([s]) => s),
-        delay(800),
-        setStatus(TaskShoperRequestStatusValue.making)
+      source.pipe(
+        tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id}`)),
+        delay(800)
       );
   }
-
 }
