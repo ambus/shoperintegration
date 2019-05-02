@@ -52,5 +52,16 @@ describe("shoperService", () => {
     shoperService.addTask(filonMerchandise);
   });
 
-
+  it("jak zostanie dodanych kilka tasków od razu to mają być one wykonane jeden po drugim z przerwą pomiędzy połączeniami", done => {
+    let shoperService = new ShoperService(Config.getInstance());
+    shoperService.doneTask$.pipe(bufferCount(3)).subscribe((val: Task[]) => {
+      expect(val[0].endTime + shoperService.config.shoperConfig.delayTimeInMilisec ).toBeLessThanOrEqual(val[1].endTime)
+      expect(val[1].endTime + shoperService.config.shoperConfig.delayTimeInMilisec ).toBeLessThanOrEqual(val[2].endTime)
+      done();
+    });
+    for (let index = 0; index < 3; index++) {
+      let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1 + index, price: (6 + index).toString() };
+      shoperService.addTask(filonMerchandise);
+    }
+  });
 });
