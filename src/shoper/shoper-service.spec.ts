@@ -43,7 +43,6 @@ describe("shoperService", () => {
     let shoperService = new ShoperService(Config.getInstance());
     let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
     shoperService.doneTask$.subscribe((val: Task) => {
-      console.warn(val)
       expect(val.id).toBeDefined();
       expect(val.id.length).toBeGreaterThan(5);
       expect(val.status).toEqual(TaskShoperRequestStatusValue.making);
