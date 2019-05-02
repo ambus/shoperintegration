@@ -7,6 +7,7 @@ import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { createTaskRequest } from "./utils/create-task-request";
 import { setStatus } from "./utils/set-status";
+import { setEndTime } from "./utils/set-end-time";
 
 export class ShoperService {
   logger: Logger;
@@ -32,8 +33,10 @@ export class ShoperService {
     setStatus(TaskShoperRequestStatusValue.making)
     // this.makeTask(),
   );
-
-  doneTask$: Observable<Task> = this.doingTask$.pipe(this.endTask$());
+  doneTask$: Observable<Task> = this.doingTask$.pipe(
+    this.endTask$(),
+    setEndTime()
+  );
 
   endTask$(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) =>

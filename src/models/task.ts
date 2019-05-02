@@ -7,4 +7,5 @@ export type Task = {
     attemptCounter: number;
     lastAttemptTime: number;
     status: TaskShoperRequestStatusValue;
+    endTime: number;
 }
