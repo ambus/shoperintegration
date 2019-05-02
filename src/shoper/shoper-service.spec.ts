@@ -38,10 +38,21 @@ describe("shoperService", () => {
     shoperService.addTask(filonMerchandise);
   });
 
+  // it("connectionpoll powinna zaczynać z zerem", done => {
+  //   let shoperService = new ShoperService(Config.getInstance());
+  //   let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
+  //   shoperService.connectionPool$.subscribe((val: Task) => {
+  //     expect(val).toBeDefined();
+  //     done();
+  //   });
+  //   shoperService.addTask(filonMerchandise);
+  // });
+
   it("każde zadanie po dodaniu i zwolnieniu kolejki powinno się pojawic w strumieniu wykonywanych zadań", done => {
     let shoperService = new ShoperService(Config.getInstance());
     let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
-    shoperService.makingTask$.subscribe((val: Task) => {
+    shoperService.doneTask$.subscribe((val: Task) => {
+      console.warn(val)
       expect(val.id).toBeDefined();
       expect(val.id.length).toBeGreaterThan(5);
       expect(val.status).toEqual(TaskShoperRequestStatusValue.making);
@@ -49,4 +60,6 @@ describe("shoperService", () => {
     });
     shoperService.addTask(filonMerchandise);
   });
+
+
 });
