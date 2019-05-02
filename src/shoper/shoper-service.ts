@@ -12,9 +12,9 @@ import { setEndTime } from "./utils/set-end-time";
 export class ShoperService {
   logger: Logger;
   filonMerchandiseAdd$: Subject<FilonMerchandise> = new Subject();
-  connectionPoolIsFree: Subject<boolean> = new BehaviorSubject(true);
+  connectionPoolIsFree: Subject<void> = new BehaviorSubject(null);
 
-  constructor(private config: Config) {
+  constructor(public config: Config) {
     this.logger = getLogger("ShoperService");
   }
 
@@ -29,20 +29,23 @@ export class ShoperService {
 
   doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree).pipe(
     map(([s, f]) => s),
-    delay(800),
-    setStatus(TaskShoperRequestStatusValue.making)
-    // this.makeTask(),
+    setStatus(TaskShoperRequestStatusValue.making),
+    share()
+    // this.makeTask()
   );
   doneTask$: Observable<Task> = this.doingTask$.pipe(
     this.endTask$(),
-    setEndTime()
+    setEndTime(),
+    tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id} i czasie ${request.endTime}`)),
+    tap((request: Task) => this.connectionPoolIsFree.next()),
+    share()
   );
 
   endTask$(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) =>
       source.pipe(
-        tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id}`)),
-        delay(800)
+        delay(this.config.shoperConfig.delayTimeInMilisec),
+        tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id}`))
       );
   }
 }
