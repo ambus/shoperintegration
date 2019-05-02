@@ -90,7 +90,6 @@ export class Config {
           products: ""
         },
         userToken: "",
-        countOfTaskMakers: 1
       }
     };
   }

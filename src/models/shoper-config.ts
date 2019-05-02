@@ -5,5 +5,4 @@ export type ShoperConfig = {
     products: string;
   };
   userToken: string;
-  countOfTaskMakers: number;
 };
