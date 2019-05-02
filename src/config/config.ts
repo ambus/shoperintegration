@@ -90,6 +90,7 @@ export class Config {
           products: ""
         },
         userToken: "",
+        delayTimeInMilisec: 800
       }
     };
   }

@@ -41,6 +41,7 @@
             "productStocks": "",
             "products": ""
         },
-        "userToken": ""
+        "userToken": "",
+        "delayTimeInMilisec": 1000
     }
 }

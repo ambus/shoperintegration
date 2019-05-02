@@ -4,6 +4,7 @@ import { FilonMerchandise } from "../models/filon-merchandise";
 import { stringGenerator } from "../lib/string-generator";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
+import { bufferCount } from "rxjs/operators";
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
