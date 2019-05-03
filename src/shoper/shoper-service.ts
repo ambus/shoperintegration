@@ -30,9 +30,14 @@ export class ShoperService {
   doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree$).pipe(
     map(([s, f]) => s),
     setStatus(TaskShoperRequestStatusValue.making),
+    this.makeTask(),
     share()
-    // this.makeTask()
   );
+
+  makeTask(): OperatorFunction<Task, Task> {
+    return (source: Observable<Task>) => source.pipe(delay(2000));
+  }
+
   doneTask$: Observable<Task> = this.doingTask$.pipe(
     this.endTask(),
     setStatus(TaskShoperRequestStatusValue.done),
