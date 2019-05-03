@@ -45,7 +45,7 @@ describe("shoperService", () => {
     shoperService.doneTask$.subscribe((val: Task) => {
       expect(val.id).toBeDefined();
       expect(val.id.length).toBeGreaterThan(5);
-      expect(val.status).toEqual(TaskShoperRequestStatusValue.making);
+      expect(val.status).toEqual(TaskShoperRequestStatusValue.done);
       done();
     });
     shoperService.addTask(filonMerchandise);

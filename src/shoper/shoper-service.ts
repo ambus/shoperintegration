@@ -12,7 +12,7 @@ import { setEndTime } from "./utils/set-end-time";
 export class ShoperService {
   logger: Logger;
   filonMerchandiseAdd$: Subject<FilonMerchandise> = new Subject();
-  connectionPoolIsFree: Subject<void> = new BehaviorSubject(null);
+  connectionPoolIsFree$: Subject<void> = new BehaviorSubject(null);
 
   constructor(public config: Config) {
     this.logger = getLogger("ShoperService");
@@ -27,21 +27,22 @@ export class ShoperService {
     share()
   );
 
-  doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree).pipe(
+  doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree$).pipe(
     map(([s, f]) => s),
     setStatus(TaskShoperRequestStatusValue.making),
     share()
     // this.makeTask()
   );
   doneTask$: Observable<Task> = this.doingTask$.pipe(
-    this.endTask$(),
+    this.endTask(),
+    setStatus(TaskShoperRequestStatusValue.done),
     setEndTime(),
     tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id} i czasie ${request.endTime}`)),
-    tap((request: Task) => this.connectionPoolIsFree.next()),
+    tap((request: Task) => this.connectionPoolIsFree$.next()),
     share()
   );
 
-  endTask$(): OperatorFunction<Task, Task> {
+  endTask(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) =>
       source.pipe(
         delay(this.config.shoperConfig.delayTimeInMilisec),
