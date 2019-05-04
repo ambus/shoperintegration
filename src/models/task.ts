@@ -8,4 +8,5 @@ export type Task = {
     lastAttemptTime: number;
     status: TaskShoperRequestStatusValue;
     endTime: number;
+    shoperConnectionTokenID: string;
 }
