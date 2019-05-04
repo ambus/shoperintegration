@@ -5,6 +5,7 @@ import { stringGenerator } from "../lib/string-generator";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { bufferCount } from "rxjs/operators";
+import { OperatorFunction, of, Observable, empty } from "rxjs";
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
@@ -54,8 +55,8 @@ describe("shoperService", () => {
   it("jak zostanie dodanych kilka tasków od razu to mają być one wykonane jeden po drugim z przerwą pomiędzy połączeniami", done => {
     let shoperService = new ShoperService(Config.getInstance());
     shoperService.doneTask$.pipe(bufferCount(3)).subscribe((val: Task[]) => {
-      expect(val[0].endTime + shoperService.config.shoperConfig.delayTimeInMilisec ).toBeLessThanOrEqual(val[1].endTime)
-      expect(val[1].endTime + shoperService.config.shoperConfig.delayTimeInMilisec ).toBeLessThanOrEqual(val[2].endTime)
+      expect(val[0].endTime + shoperService.config.shoperConfig.delayTimeInMilisec).toBeLessThanOrEqual(val[1].endTime);
+      expect(val[1].endTime + shoperService.config.shoperConfig.delayTimeInMilisec).toBeLessThanOrEqual(val[2].endTime);
       done();
     });
     for (let index = 0; index < 3; index++) {
