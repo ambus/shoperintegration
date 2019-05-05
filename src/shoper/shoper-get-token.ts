@@ -9,7 +9,9 @@ export class ShoperGetToken {
   public static authorizationToken: string;
 
   public static getToken(userToken: string, refreshToken: boolean): Observable<string> {
-    let createXHR = new XMLHttpRequest();
+    let createXHR = function() {
+      return new XMLHttpRequest();
+    };
     if (refreshToken || !this.authorizationToken) {
       return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } }).pipe(
         map((token: AjaxResponse) => token.response.access_token),
