@@ -64,4 +64,14 @@ describe("shoperService", () => {
       shoperService.addTask(filonMerchandise);
     }
   });
+
+  it("powinien zostać pobrany token służący do autoryzacji połączenia i przekazany do funkcji makeTask", done => {
+    let shoperService = new ShoperService(Config.getInstance());
+    shoperService.doingTask$.subscribe((val: Task) => {
+      expect(val.shoperConnectionTokenID.length).toBeGreaterThan(1);
+      done();
+    });
+    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
+    shoperService.addTask(filonMerchandise);
+  });
 });
