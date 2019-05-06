@@ -75,4 +75,14 @@ describe("shoperService", () => {
     let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
     shoperService.addTask(filonMerchandise);
   });
+
+  //jeśli nie można wykonać zadania to ponowić próbę jego wykonania 3 krotnie
+  //  - jesli próba nie uda się 3 krotnie to wysłać powiadomienie na @
+  //pobranie towaru znajdującego się w bazie shopera - do porównania
+  //  - jeśli nie można pobrać to czy próba jest ponawiana 3 razy
+  //  - jesli jest błąd to wysłać powiadomienie o błędzie
+
+  //porównanie towaru z filona z towarem shopera
+
+  //jeśli są róznice to wysłać nowe dane do shopera
 });
