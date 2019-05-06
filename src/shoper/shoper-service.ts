@@ -1,6 +1,6 @@
 import { getLogger, Logger } from "log4js";
-import { BehaviorSubject, Observable, OperatorFunction, Subject, zip, throwError, of, timer } from "rxjs";
-import { delay, map, share, switchMap, tap, retry, catchError, retryWhen, delayWhen } from "rxjs/operators";
+import { BehaviorSubject, Observable, OperatorFunction, Subject, throwError, zip } from "rxjs";
+import { catchError, delay, map, share, switchMap, tap, retryWhen } from "rxjs/operators";
 import { Config } from "../config/config";
 import { FilonMerchandise } from "../models/filon-merchandise";
 import { Task } from "../models/task";
@@ -31,8 +31,8 @@ export class ShoperService {
 
   doingTask$: Observable<Task> = zip(this._taskRequest$, this.connectionPoolIsFree$).pipe(
     map(([s, f]) => s),
-    this.setConnectionToken(),
     setStatus(TaskShoperRequestStatusValue.making),
+    this.setConnectionToken()
   );
 
   setConnectionToken(): OperatorFunction<Task, Task> {
@@ -45,9 +45,9 @@ export class ShoperService {
             innerValue,
             outerIndex,
             innerIndex
-          }),
+          })
         ),
-        map((val: { outerValue: Task; innerValue: string; outerIndex: number; innerIndex: number; }) => {
+        map((val: { outerValue: Task; innerValue: string; outerIndex: number; innerIndex: number }) => {
           val.outerValue.shoperConnectionTokenID = val.innerValue;
           return val.outerValue;
         })
