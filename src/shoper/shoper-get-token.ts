@@ -3,6 +3,8 @@ import { ajax, AjaxResponse } from "rxjs/ajax";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { map, retryWhen, tap } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
+import { Config } from "../config/config";
+import { retryStrategy } from "./utils/retry-strategy";
 
 export class ShoperGetToken {
   static authorizationToken: string;
@@ -11,7 +13,13 @@ export class ShoperGetToken {
     if (refreshToken || !this.authorizationToken) {
       return this._getAjaxConnection(userToken, refreshToken).pipe(
         map((token: AjaxResponse) => token.response.access_token),
-        tap((token: string) => (this.authorizationToken = token))
+        tap((token: string) => (this.authorizationToken = token)),
+        retryWhen(
+          retryStrategy({
+            maxRetryAttempts: maxRetryAttempts,
+            scalingDuration: delayTimeInMilisec
+          })
+        )
       );
     } else {
       return Observable.create((observer: AnonymousSubject<string>) => {
