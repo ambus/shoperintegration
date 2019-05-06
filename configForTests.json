@@ -42,6 +42,7 @@
             "products": ""
         },
         "userToken": "",
-        "delayTimeInMilisec": 1000
+        "delayTimeInMilisec": 1000,
+        "maxRetryAttempts": 3
     }
 }

@@ -90,7 +90,8 @@ export class Config {
           products: ""
         },
         userToken: "",
-        delayTimeInMilisec: 800
+        delayTimeInMilisec: 800,
+        maxRetryAttempts: 3
       }
     };
   }

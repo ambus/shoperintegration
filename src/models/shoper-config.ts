@@ -6,4 +6,5 @@ export type ShoperConfig = {
   };
   userToken: string;
   delayTimeInMilisec: number;
+  maxRetryAttempts: number;
 };
