@@ -5,7 +5,8 @@ import { stringGenerator } from "../lib/string-generator";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { bufferCount } from "rxjs/operators";
-import { OperatorFunction, of, Observable, empty } from "rxjs";
+import { OperatorFunction, of, Observable, empty, throwError } from "rxjs";
+import { ShoperGetToken } from "./shoper-get-token";
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
