@@ -54,4 +54,23 @@ describe("shoperGetToken", () => {
       });
     });
   });
+
+  it("funkcja _getAjaxConnection musi zwrócić obiekt AjaxRequest", () => {
+    expect(ShoperGetToken._getAjaxConnection).toBeDefined();
+  });
+
+  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd", done => {
+    let errorString = "Błąd przy pobieraniu tokena";
+    let mockFn = jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockImplementation((token, refresh) => {
+      return throwError(errorString);
+    });
+    ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, 200, 3).subscribe(
+      (val: string) => {},
+      err => {
+        expect(mockFn.mock.calls.length).toBe(1);
+        expect(err).toBe("Błąd przy pobieraniu tokena");
+        done();
+      }
+    );
+  });
 });
