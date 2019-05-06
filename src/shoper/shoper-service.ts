@@ -55,11 +55,23 @@ export class ShoperService {
   }
 
   doneTask$: Observable<Task> = this.doingTask$.pipe(
+    retryWhen(
+      retryStrategy({
+        maxRetryAttempts: this.config.shoperConfig.maxRetryAttempts | 3,
+        scalingDuration: this.config.shoperConfig.delayTimeInMilisec | 1000
+      })
+    ),
     this.endTask(),
     setStatus(TaskShoperRequestStatusValue.done),
     setEndTime(),
     tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id} i czasie ${request.endTime}`)),
-    tap((request: Task) => this.connectionPoolIsFree$.next())
+    tap((request: Task) => this.connectionPoolIsFree$.next()),
+    catchError(err => {
+      this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
+      //TODO wysłać @
+      this.connectionPoolIsFree$.next();
+      return throwError(err);
+    })
   );
 
   endTask(): OperatorFunction<Task, Task> {
