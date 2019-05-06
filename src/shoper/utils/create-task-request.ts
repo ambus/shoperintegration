@@ -8,5 +8,7 @@ export const createTaskRequest: (filonMerchandise: FilonMerchandise) => Task = f
     filonMerchandise: filonMerchandise,
     attemptCounter: 0,
     lastAttemptTime: undefined,
-    status: TaskShoperRequestStatusValue.requested
+    status: TaskShoperRequestStatusValue.requested,
+    endTime: null,
+    shoperConnectionTokenID: null
 });
