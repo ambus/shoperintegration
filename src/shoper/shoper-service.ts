@@ -10,6 +10,7 @@ import { createTaskRequest } from "./utils/create-task-request";
 import { setEndTime } from "./utils/set-end-time";
 import { setStatus } from "./utils/set-status";
 import { retryStrategy } from "./utils/retry-strategy";
+import { ErrorObject } from "../models/error-object";
 
 export class ShoperService {
   logger: Logger;

@@ -5,6 +5,8 @@ export type Task = {
     id: string;
     filonMerchandise: FilonMerchandise;
     status: TaskShoperRequestStatusValue;
+    attemptCounter: number;
+    lastAttemptTime: number;
     endTime: number;
     shoperConnectionTokenID: string;
 }
