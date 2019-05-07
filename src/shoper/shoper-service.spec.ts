@@ -1,12 +1,10 @@
+import { bufferCount } from "rxjs/operators";
 import { Config } from "../config/config";
-import { ShoperService } from "./shoper-service";
-import { FilonMerchandise } from "../models/filon-merchandise";
 import { stringGenerator } from "../lib/string-generator";
+import { FilonMerchandise } from "../models/filon-merchandise";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
-import { bufferCount } from "rxjs/operators";
-import { OperatorFunction, of, Observable, empty, throwError } from "rxjs";
-import { ShoperGetToken } from "./shoper-get-token";
+import { ShoperService } from "./shoper-service";
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
