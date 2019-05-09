@@ -1,10 +1,14 @@
-import { bufferCount } from "rxjs/operators";
+import { bufferCount, share, finalize, switchMap, tap, map, catchError } from "rxjs/operators";
 import { Config } from "../config/config";
 import { stringGenerator } from "../lib/string-generator";
 import { FilonMerchandise } from "../models/filon-merchandise";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { ShoperService } from "./shoper-service";
+import { throwError, Observable, interval, empty } from "rxjs";
+import { ShoperGetToken } from "./shoper-get-token";
+import { ErrorTask } from "../models/error-task";
+import { AnonymousSubject } from "rxjs/internal/Subject";
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
@@ -74,13 +78,27 @@ describe("shoperService", () => {
     shoperService.addTask(filonMerchandise);
   });
 
-  //jeśli nie można wykonać zadania to ponowić próbę jego wykonania 3 krotnie
-  //  - jesli próba nie uda się 3 krotnie to wysłać powiadomienie na @
-  //pobranie towaru znajdującego się w bazie shopera - do porównania
-  //  - jeśli nie można pobrać to czy próba jest ponawiana 3 razy
-  //  - jesli jest błąd to wysłać powiadomienie o błędzie
 
-  //porównanie towaru z filona z towarem shopera
+});
 
-  //jeśli są róznice to wysłać nowe dane do shopera
+describe("shoperService - błędy połączenia", () => {
+  it("jeśli wykonywanie zadania się nie powiedzie to należy ponowić próbę jego wykonania zgodnie w ilości podanej w konfiguracji", done => {
+    let config = Config.getInstance();
+    config.shoperConfig.delayTimeInMilisec = 50;
+    let shoperService = new ShoperService(config);
+
+    let mockFn = jest.spyOn(shoperService, "getToken").mockReturnValue(
+      throwError("error")
+    );
+
+    shoperService.doneTask$.subscribe((task: Task) => {
+      expect(task.attemptCounter).toBe(config.shoperConfig.maxRetryAttempts);
+      expect(task.status).toBe(TaskShoperRequestStatusValue.error);
+      done();
+    });
+    let product_code = stringGenerator();
+
+    let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00" };
+    shoperService.addTask(filonMerchandise);
+  });
 });
