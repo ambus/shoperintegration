@@ -29,10 +29,6 @@ describe("shoperGetToken", () => {
     });
   });
 
-  // it("createXHR tworzy nowy obiekt XMLHttpRequest", () => {
-  //   expect(ShoperGetToken.createXHR()).toBeDefined();
-  // });
-
   it("przy drugim wywołaniu powinna zwrócić ten sam token", done => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();

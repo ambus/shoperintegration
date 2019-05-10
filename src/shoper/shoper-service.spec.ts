@@ -1,14 +1,30 @@
-import { bufferCount, share, finalize, switchMap, tap, map, catchError } from "rxjs/operators";
+import { throwError, of } from "rxjs";
+import { bufferCount } from "rxjs/operators";
 import { Config } from "../config/config";
 import { stringGenerator } from "../lib/string-generator";
 import { FilonMerchandise } from "../models/filon-merchandise";
 import { Task } from "../models/task";
 import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-status-value";
 import { ShoperService } from "./shoper-service";
-import { throwError, Observable, interval, empty } from "rxjs";
-import { ShoperGetToken } from "./shoper-get-token";
-import { ErrorTask } from "../models/error-task";
-import { AnonymousSubject } from "rxjs/internal/Subject";
+import { AjaxResponse } from "rxjs/ajax";
+
+let mockupData: AjaxResponse = {
+  originalEvent: null,
+  xhr: null,
+  request: null,
+  status: null,
+  response: {
+    access_token: stringGenerator(),
+    expires_in: 2592000,
+    token_type: "bearer"
+  },
+  responseText: null,
+  responseType: null
+};
+
+jest.mock("rxjs/ajax", () => ({
+  ajax: jest.fn(() => of(mockupData))
+}));
 
 describe("shoperService", () => {
   it("można utworzyć obiekt shoperService", () => {
@@ -77,6 +93,7 @@ describe("shoperService", () => {
     let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
     shoperService.addTask(filonMerchandise);
   });
+
 
 
 });
