@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "test-coverage": "NODE_ENV=development jest --coverage",
-    "test": "NODE_ENV=development jest",
+    "test": "NODE_ENV=development jest --verbose",
     "test:console": "NODE_ENV=development jest --verbose false",
     "test:watch": "NODE_ENV=development jest --watch",
     "test:watch:non-console": "NODE_ENV=development jest --watch --verbose false",
