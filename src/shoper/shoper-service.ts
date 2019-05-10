@@ -10,15 +10,18 @@ import { createTaskRequest } from "./utils/create-task-request";
 import { setEndTime } from "./utils/set-end-time";
 import { setStatus } from "./utils/set-status";
 import { ErrorTask } from "../models/error-task";
+import { EMail } from "../mail/email";
 
 export class ShoperService {
   logger: Logger;
   filonMerchandiseAdd$: Subject<FilonMerchandise> = new Subject();
   connectionPoolIsFree$: Subject<void> = new BehaviorSubject(null);
   errorStream$: Subject<Task> = new Subject<Task>();
+  eMail: EMail;
 
   constructor(public config: Config) {
     this.logger = getLogger("ShoperService");
+    this.eMail = new EMail(config);
   }
 
   addTask(filonMerchandise: FilonMerchandise): void {
@@ -90,8 +93,10 @@ export class ShoperService {
             iif(
               () => task.status === TaskShoperRequestStatusValue.error,
               of(task).pipe(
-                tap((request: Task) => this.logger.error(`Nie udało się wykonać zadania o id ${request.id}.`))
-                //TODO wysłać @
+                tap((request: Task) => this.logger.error(`Nie udało się wykonać zadania o id ${request.id}.`)),
+                tap((task: Task) => {
+                  this.eMail.sendMail("Nie można ukończyć zadania aktualizacji danych towaru", task);
+                })
               ),
               of(task).pipe(setStatus(TaskShoperRequestStatusValue.done))
             )
@@ -106,7 +111,7 @@ export class ShoperService {
     tap((request: Task) => this.connectionPoolIsFree$.next()),
     catchError(err => {
       this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
-      //TODO wysłać @
+      this.eMail.sendMail("Nie można ukończyć zadania aktualizacji danych towaru - strumień został wstrzymany i jest niezbędny jego restart", err);
       return throwError(err);
     }),
     finalize(() => this.logger.error("Strumień zakończył pracę")) //TODO ten strumień nie powinien nigdy zakończyć pracy. Wysłać @ lub smsa z powiadomieniem o napotkanym zakończeniu działania

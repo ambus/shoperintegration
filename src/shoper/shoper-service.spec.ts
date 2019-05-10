@@ -108,9 +108,12 @@ describe("shoperService - błędy połączenia", () => {
       throwError("error")
     );
 
+    let sendMail = jest.spyOn(shoperService.eMail, 'sendMail')
+
     shoperService.doneTask$.subscribe((task: Task) => {
       expect(task.attemptCounter).toBe(config.shoperConfig.maxRetryAttempts);
       expect(task.status).toBe(TaskShoperRequestStatusValue.error);
+      expect(sendMail).toBeCalled();
       done();
     });
     let product_code = stringGenerator();
