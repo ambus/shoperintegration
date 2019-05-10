@@ -56,8 +56,7 @@ export class ShoperService {
       return source.pipe(
         tap((task: Task) => (taskToUpdate = task)),
         switchMap(
-          (task: Task) =>
-          this.getToken(),
+          (task: Task) => this.getToken(),
           (outerValue, innerValue, outerIndex, innerIndex) => ({
             outerValue,
             innerValue,
@@ -77,8 +76,8 @@ export class ShoperService {
     };
   }
 
-  getToken(): Observable<string>{
-    return ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, false, Config.getInstance().shoperConfig.delayTimeInMilisec, Config.getInstance().shoperConfig.maxRetryAttempts)
+  getToken(): Observable<string> {
+    return ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, false, Config.getInstance().shoperConfig.delayTimeInMilisec, Config.getInstance().shoperConfig.maxRetryAttempts);
   }
 
   doneTask$: Observable<Task> = this.doingTask$.pipe(
