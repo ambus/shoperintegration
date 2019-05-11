@@ -1,5 +1,6 @@
 import { FilonMerchandise } from "./filon-merchandise";
 import { TaskShoperRequestStatusValue } from "./task-shoper-request-status-value";
+import { ShoperStock } from "./shoper-stock";
 
 export type Task = {
     id: string;
@@ -9,4 +10,5 @@ export type Task = {
     lastAttemptTime: number;
     endTime: number;
     shoperConnectionTokenID: string;
+    shoperStock: ShoperStock
 }
