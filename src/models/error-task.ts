@@ -1,6 +1,7 @@
 import { Task } from "./task";
 import { TaskShoperRequestStatusValue } from "./task-shoper-request-status-value";
 import { FilonMerchandise } from "./filon-merchandise";
+import { ShoperStock } from "./shoper-stock";
 
 export class ErrorTask implements Task {
   id: string;
@@ -11,6 +12,7 @@ export class ErrorTask implements Task {
   endTime: number;
   shoperConnectionTokenID: string;
   message: string;
+  shoperStock: ShoperStock;
 
   constructor(task: Task, message: string) {
     this.id = task.id;
@@ -21,5 +23,6 @@ export class ErrorTask implements Task {
     this.endTime = task.endTime;
     this.shoperConnectionTokenID = task.shoperConnectionTokenID;
     this.message = message;
+    this.shoperStock = task.shoperStock;
   }
 }
