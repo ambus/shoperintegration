@@ -4,7 +4,7 @@ import { stringGenerator } from "../../lib/string-generator";
 import { ShoperStock } from "../../models/shoper-stock";
 
 describe("shoperGetToken", () => {
-  it("musi zawierać konstruktor", done => {
+  it("musi zawierać konstruktor", () => {
     let shoperStockService = new ShoperStockService(Config.getInstance());
     expect(shoperStockService).toBeDefined();
   });
