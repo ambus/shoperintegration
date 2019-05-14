@@ -75,6 +75,7 @@ describe("CSVParser", () => {
       .subscribe((filonMerchandises: FilonMerchandise[]) => {
         expect(filonMerchandises.length).toBe(4);
         expect(filonMerchandises[0].product_code).toBe("BSZK0F1FLE051");
+        done();
       });
   });
 });
