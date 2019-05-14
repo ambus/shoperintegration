@@ -1,9 +1,12 @@
 import { configure, getLogger, Logger } from "log4js";
+import { iif, of, throwError } from "rxjs";
+import { concatMap, delay, retryWhen, tap } from "rxjs/operators";
 import { Config } from "./config/config";
+import { parseCSVDataStream } from "./csv-parser/csv-parser";
 import { FileWatcher } from "./file-watcher/file-watcher";
-import { retryWhen, tap, delayWhen, mergeMap, concatMap, delay } from "rxjs/operators";
-import { timer, Observable, iif, throwError, of } from "rxjs";
 import { FilonMerchandise } from "./models/filon-merchandise";
+import { replaceCommaInPrice } from "./replace-comma/replace-comma";
+import { ShoperService } from "./shoper/shoper-service";
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -12,10 +15,12 @@ export class Index {
   config: Config;
   fw: FileWatcher = new FileWatcher();
   readFileOnStart: boolean = true;
+  shoperService: ShoperService;
 
   constructor(configFileName: string) {
     this.init(configFileName);
     this.fw = new FileWatcher();
+    this.shoperService = new ShoperService(this.config);
   }
 
   init(configFileName: string): void {
@@ -45,26 +50,19 @@ export class Index {
       .startWatch(this.config.fileInfo.path, this.config.fileInfo.fileName, this.readFileOnStart)
       .pipe(
         tap(val => this.logger.debug("Nowe dane w strumieniu", val)),
-        this.retryPipeline
+        this.retryPipeline,
+        parseCSVDataStream(this.config.parserOptions),
+        replaceCommaInPrice(),
       )
       .subscribe(
-        (data: string) => {
-          try {
-            let parsedData = this.parseData(data);
-            this.sendDataToShoper(parsedData);
-          } catch (err) {}
+        (filonMerchandises: FilonMerchandise[]) => {
+          filonMerchandises.forEach((filonItems: FilonMerchandise) => {
+            this.shoperService.addTask(filonItems);
+          });
         },
         err => {}
       );
   }
-  parseData(data: string): FilonMerchandise[] {
-    // console.warn("TODO parse string to javascript opbject");
-
-    return undefined;
-  }
-  sendDataToShoper(filonMerchandises: FilonMerchandise[]): void {
-    console.warn("TODO send parsed data do shoper");
-  }
 }
 
-// new Index(CONFIG_FILE_NAME).startWatchFile();
+new Index(CONFIG_FILE_NAME).startWatchFile();
