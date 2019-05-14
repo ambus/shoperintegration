@@ -59,8 +59,8 @@ export class ShoperStockService {
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {
-          this.logger.error(`Napotkano błąd podczas ustawiania tokena połączenia: `, err, taskToUpdate);
-          return throwError(new ErrorTask(taskToUpdate, err));
+          this.logger.error(`Napotkano błąd podczas pobierania informacji - stock: `, err, taskToUpdate);
+          return throwError(new ErrorTask(taskToUpdate || err, err));
         })
       );
     };
