@@ -10,5 +10,8 @@ export const createTaskRequest: (filonMerchandise: FilonMerchandise) => Task = f
     lastAttemptTime: undefined,
     status: TaskShoperRequestStatusValue.requested,
     endTime: null,
-    shoperConnectionTokenID: null
+    shoperConnectionTokenID: null,
+    shoperStock: null,
+    stockToUpdate: undefined,
+    updateStatus: null
 });
