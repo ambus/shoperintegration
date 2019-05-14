@@ -2,6 +2,8 @@ import { getLogger } from "log4js";
 import { FilonMerchandise } from "../models/filon-merchandise";
 import parse = require("csv-parse/lib/sync");
 import { ParserOptions } from "../models/parser-options";
+import { OperatorFunction, Observable, throwError } from "rxjs";
+import { map, catchError } from "rxjs/operators";
 
 export const logger = getLogger();
 
@@ -34,3 +36,19 @@ function replaceCommaInFilonMerchandisesPrices(merchandise: FilonMerchandise[]):
   logger.debug(`Dane po zamienie przecinków na kropki:`, merchandise);
   return merchandise;
 }
+
+export function parseCSVDataStream(parseOptions: ParserOptions): OperatorFunction<string, FilonMerchandise[]> {
+  return (source: Observable<string>) => {
+    return source.pipe(
+      map((filonMerchandisesString: string) => {
+        return parseCSVDataToFilonMerchandise(filonMerchandisesString, parseOptions)
+      }),
+      catchError((err: any, caught: Observable<FilonMerchandise[]>) => {
+        this.logger.error(`Napotkano błąd podczas zmieniania przecinków na kropki w danych z filona`, err);
+        throwError(err);
+        return caught;
+      })
+    );
+  };
+}
+

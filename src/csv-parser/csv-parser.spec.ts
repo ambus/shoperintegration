@@ -1,6 +1,8 @@
-import { parseCSVDataToFilonMerchandise, logger } from "./csv-parser";
+import { parseCSVDataToFilonMerchandise, logger, parseCSVDataStream } from "./csv-parser";
 import { Config } from "../config/config";
 import { FilonMerchandise } from "../models/filon-merchandise";
+import { of } from "rxjs";
+import { filonStringMerchandise } from "../../test/mockup/filon-string.mockup";
 
 const DATA_WITH_ERROR = `
 product_code; srower,sdfasdkfj,asdfkj
@@ -65,5 +67,14 @@ describe("CSVParser", () => {
     merchandises.forEach((merchandise: FilonMerchandise) => {
       expect(Number(merchandise.price)).not.toBeNaN();
     });
+  });
+
+  it("jeśli korzystamy ze strumienia to po transformacji powinniśmy otrzymać obiekt FilonMerchandise[]", done => {
+    of(filonStringMerchandise)
+      .pipe(parseCSVDataStream(config.parserOptions))
+      .subscribe((filonMerchandises: FilonMerchandise[]) => {
+        expect(filonMerchandises.length).toBe(4);
+        expect(filonMerchandises[0].product_code).toBe("BSZK0F1FLE051");
+      });
   });
 });
