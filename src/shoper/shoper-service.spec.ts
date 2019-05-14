@@ -10,6 +10,7 @@ import { AnonymousSubject } from "rxjs/internal/Subject";
 import { ShoperStock } from "../models/shoper-stock";
 import { shoperStockMockup, mockup_getAjaxStock } from "../../test/mockup/shoper-stock.mockup";
 import { mockup_shoperGetToken } from "../../test/mockup/shoper-get-token.mockup";
+import { mockup_pushAjaxShoperUpdate } from "../../test/mockup/shoper-update.mockup";
 import { ShoperGetToken } from "./shoper-get-token";
 
 describe("shoperService", () => {
@@ -19,6 +20,7 @@ describe("shoperService", () => {
     shoperService = new ShoperService(Config.getInstance());
     shoperService.shoperStockService;
     mockup_getAjaxStock(shoperService.shoperStockService);
+    mockup_pushAjaxShoperUpdate(shoperService.shoperUpdateService);
   });
 
   it("można utworzyć obiekt shoperService", () => {
@@ -89,6 +91,21 @@ describe("shoperService", () => {
       done();
     });
     let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
+    shoperService.addTask(filonMerchandise);
+  });
+
+  it("po dodaniu towaru do strumienia powinien pojawić się wykonany task w strumieniu zakończonych zadań", done => {
+    let stock = Math.round(Math.random() * 100);
+    shoperService.doneTask$.subscribe((val: Task) => {
+      console.warn(val)
+      expect(val.shoperStock).toBeDefined();
+      expect(val.shoperStock).toBe(shoperStockMockup.response.list[0]);
+      expect(val.shoperConnectionTokenID).toBeDefined();
+      expect(val.updateStatus).toBe(1);
+      expect(val.stockToUpdate.stock).toBe(stock.toString());
+      done();
+    });
+    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: stock, price: "16.00" };
     shoperService.addTask(filonMerchandise);
   });
 });

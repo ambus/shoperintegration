@@ -12,6 +12,8 @@ import { setStatus } from "./utils/set-status";
 import { ErrorTask } from "../models/error-task";
 import { EMail } from "../mail/email";
 import { ShoperStockService } from "./shoper-stock-service/shoper-stock-service";
+import { ShoperUpdateService } from "./shoper-update-service/shoper-update-service";
+import { CompareService } from "./compare-service/compare-service";
 
 export class ShoperService {
   logger: Logger;
@@ -20,11 +22,15 @@ export class ShoperService {
   errorStream$: Subject<Task> = new Subject<Task>();
   eMail: EMail;
   shoperStockService: ShoperStockService;
+  shoperUpdateService: ShoperUpdateService;
+  compareService: CompareService;
 
   constructor(public config: Config) {
     this.logger = getLogger("ShoperService");
     this.eMail = new EMail(config);
     this.shoperStockService = new ShoperStockService(config);
+    this.shoperUpdateService = new ShoperUpdateService(config);
+    this.compareService = new CompareService();
   }
 
   addTask(filonMerchandise: FilonMerchandise): void {
@@ -44,13 +50,14 @@ export class ShoperService {
       of(task).pipe(
         this.setConnectionToken(),
         this.shoperStockService.setShoperStock(),
+        this.compareService.generateItemToUpdate(),
+        this.shoperUpdateService.updateShoperStock(),
         catchError(err => {
           err.status = TaskShoperRequestStatusValue.error;
           return of(err);
         }),
         //TODO porównywanie danych shoper - dane lokalne
         //TODO w przypadku potrzeby aktualizacji danych w shoperze wywołać zapisanie danych
-
         finalize(() => this.logger.debug("Zakończono działanie sekwencji w switchMap - doingTask"))
       )
     ),
@@ -60,7 +67,7 @@ export class ShoperService {
   setConnectionToken(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) => {
       let taskToUpdate: Task;
-      let refreshToken = (taskToUpdate && (taskToUpdate.status === TaskShoperRequestStatusValue.error)) ? true : false;
+      let refreshToken = taskToUpdate && taskToUpdate.status === TaskShoperRequestStatusValue.error ? true : false;
       return source.pipe(
         tap((task: Task) => (taskToUpdate = task)),
         switchMap(
