@@ -1,10 +1,14 @@
-import { Index } from "./index";
-const TEST_CONFIG_FILE_PATH = "configForTests.json";
 import * as fs from "fs";
-import { stringGenerator } from "./lib/string-generator";
 import { Observable } from "rxjs";
 import { AnonymousSubject } from "rxjs/internal/Subject";
-import { retryWhen } from "rxjs/operators";
+import { filonStringMerchandise } from "../test/mockup/filon-string.mockup";
+import { mockup_shoperGetToken } from "../test/mockup/shoper-get-token.mockup";
+import { mockup_getAjaxStock } from "../test/mockup/shoper-stock.mockup";
+import { mockup_pushAjaxShoperUpdate } from "../test/mockup/shoper-update.mockup";
+import { Index } from "./index";
+import { stringGenerator } from "./lib/string-generator";
+import { Task } from "./models/task";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 var index: Index;
 const EXAMPLE_DATA = `product_code;stock;price
@@ -43,20 +47,6 @@ describe("Index", () => {
     done();
   });
 
-  it("po otrzymaniu danych powinien wywołać funkcję przekazującą dane do aktualizacji w shoperze", done => {
-    let index2: Index;
-    index2 = new Index(TEST_CONFIG_FILE_PATH);
-    let fileName = `${stringGenerator()}.csv`;
-    index2.config.fileInfo.fileName = fileName;
-
-    spyOn(index2, "sendDataToShoper").and.callFake(function(obj: {}) {
-      done();
-    });
-
-    index2.startWatchFile();
-    fs.writeFileSync(`tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
-  });
-
   it("w przypadku błędu odczytu pliku powinien pięciokrotnie ponowić próbę odczytu", done => {
     let index2: Index;
     index2 = new Index(TEST_CONFIG_FILE_PATH);
@@ -89,5 +79,33 @@ describe("Index", () => {
       observer.error(new Error("Napotkano błąd podczas próby odczytu pliku"));
     });
     obser.pipe(index2.retryPipeline).subscribe((data: any) => {}, err => {});
+  });
+});
+
+describe("index - testy integracyjne", () => {
+  let index: Index;
+  let fileName = `${stringGenerator()}.csv`;
+  jest.setTimeout(20000);
+  beforeEach(() => {
+    index = new Index(TEST_CONFIG_FILE_PATH);
+    index.config.fileInfo.fileName = fileName;
+    index.config.fileInfo.path = "tmp";
+    index.config.shoperConfig.delayTimeInMilisec = 10;
+    mockup_shoperGetToken();
+    mockup_getAjaxStock(index.shoperService.shoperStockService);
+    mockup_pushAjaxShoperUpdate(index.shoperService.shoperUpdateService);
+  });
+
+  it("gdy dane pojawią się w pliku musi przejść cały proces i dane muszą pozytywnie zostać zaktualizowane w shoperze", done => {
+    index.startWatchFile();
+    let counter = 0;
+    index.shoperService.doneTask$.subscribe((task: Task) => {
+      counter++;
+      if (counter === 4) {
+        expect(task.filonMerchandise.product_code).toBe("SBARDC22");
+        done();
+      }
+    });
+    fs.writeFileSync(`tmp/${fileName}`, filonStringMerchandise, { encoding: "utf8" });
   });
 });
