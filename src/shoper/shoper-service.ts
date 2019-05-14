@@ -56,8 +56,6 @@ export class ShoperService {
           err.status = TaskShoperRequestStatusValue.error;
           return of(err);
         }),
-        //TODO porównywanie danych shoper - dane lokalne
-        //TODO w przypadku potrzeby aktualizacji danych w shoperze wywołać zapisanie danych
         finalize(() => this.logger.debug("Zakończono działanie sekwencji w switchMap - doingTask"))
       )
     ),
