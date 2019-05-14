@@ -11,6 +11,7 @@ export type Task = {
     lastAttemptTime: number;
     endTime: number;
     shoperConnectionTokenID: string;
-    shoperStock: ShoperStock
-    stockToUpdate?: StockToUpdate
+    shoperStock: ShoperStock;
+    stockToUpdate?: StockToUpdate;
+    updateStatus?: any;
 }
