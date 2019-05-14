@@ -87,9 +87,12 @@ export class Config {
         urls: {
           token: "",
           productStocks: "",
-          products: ""
+          products: "",
+          productStocksUpdate: ""
         },
-        userToken: ""
+        userToken: "",
+        delayTimeInMilisec: 800,
+        maxRetryAttempts: 3
       }
     };
   }

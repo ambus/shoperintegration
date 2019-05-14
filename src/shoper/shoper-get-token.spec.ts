@@ -1,27 +1,18 @@
+import { Observable } from "rxjs";
+import { AnonymousSubject } from "rxjs/internal/Subject";
+import { mockupData_shoperGetToken, mockup_shoperGetToken } from "../../test/mockup/shoper-get-token.mockup";
 import { Config } from "../config/config";
-import { ShoperGetToken } from "./shoper-get-token";
-import { ajax, AjaxResponse } from "rxjs/ajax";
-import { of } from "rxjs";
 import { stringGenerator } from "../lib/string-generator";
+import { ShoperGetToken } from "./shoper-get-token";
 
-let mockupData: AjaxResponse = {
-  originalEvent: null,
-  xhr: null,
-  request: null,
-  status: null,
-  response: {
-    access_token: stringGenerator(),
-    expires_in: 2592000,
-    token_type: "bearer"
-  },
-  responseText: null,
-  responseType: null
-};
-jest.mock("rxjs/ajax", () => ({
-  ajax: jest.fn(() => of(mockupData))
-}));
-
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 describe("shoperGetToken", () => {
+  beforeAll(() => {
+    mockup_shoperGetToken();
+  });
+
   it("powinien zwracać string z tokenem", done => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
@@ -29,14 +20,10 @@ describe("shoperGetToken", () => {
     });
   });
 
-  // it("createXHR tworzy nowy obiekt XMLHttpRequest", () => {
-  //   expect(ShoperGetToken.createXHR()).toBeDefined();
-  // });
-
-  it("przy drugim wywołaniu powinna zwrócić ten sam token", (done) => {
+  it("przy drugim wywołaniu powinna zwrócić ten sam token", done => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
-      mockupData.response.access_token = stringGenerator();
+      mockupData_shoperGetToken.response.access_token = stringGenerator();
       ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, false).subscribe((val2: string) => {
         expect(val).toEqual(val2);
         done();
@@ -44,14 +31,40 @@ describe("shoperGetToken", () => {
     });
   });
 
-  it("przy drugim wywołaniu i refreshu powinna zwrócić nowy obiekt", (done) => {
+  it("przy drugim wywołaniu i refreshu powinna zwrócić nowy obiekt", done => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
-      mockupData.response.access_token = stringGenerator();
+      mockupData_shoperGetToken.response.access_token = stringGenerator();
       ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val2: string) => {
         expect(val).not.toEqual(val2);
         done();
       });
     });
+  });
+
+  it("funkcja _getAjaxConnection musi zwrócić obiekt AjaxRequest", () => {
+    expect(ShoperGetToken._getAjaxConnection).toBeDefined();
+  });
+});
+
+describe("shoperGetToken - błędy połączenia", () => {
+  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd", done => {
+    let errorString = "Błąd przy pobieraniu tokena";
+    let counter = -1;
+    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        counter++;
+        observer.error(errorString);
+      })
+    );
+
+    ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, 200, 3).subscribe(
+      (val: string) => {},
+      err => {
+        expect(counter).toBe(3);
+        expect(err).toBe("Błąd przy pobieraniu tokena");
+        done();
+      }
+    );
   });
 });

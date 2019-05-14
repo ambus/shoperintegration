@@ -1,19 +1,25 @@
 import { Observable } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { AnonymousSubject } from "rxjs/internal/Subject";
-import { Config } from "../config/config";
-import { tap, map } from "rxjs/operators";
+import { map, retryWhen, tap } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
+import { Config } from "../config/config";
+import { retryStrategy } from "./utils/retry-strategy";
 
 export class ShoperGetToken {
-  public static authorizationToken: string;
+  static authorizationToken: string;
 
-  public static getToken(userToken: string, refreshToken: boolean): Observable<string> {
-    let createXHR = new XMLHttpRequest()
+  static getToken(userToken: string, refreshToken: boolean, delayTimeInMilisec: number = 1000, maxRetryAttempts: number = 3): Observable<string> {
     if (refreshToken || !this.authorizationToken) {
-      return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } }).pipe(
+      return this._getAjaxConnection(userToken, refreshToken).pipe(
         map((token: AjaxResponse) => token.response.access_token),
-        tap((token: string) => (this.authorizationToken = token))
+        tap((token: string) => (this.authorizationToken = token)),
+        retryWhen(
+          retryStrategy({
+            maxRetryAttempts: maxRetryAttempts,
+            scalingDuration: delayTimeInMilisec
+          })
+        )
       );
     } else {
       return Observable.create((observer: AnonymousSubject<string>) => {
@@ -21,5 +27,12 @@ export class ShoperGetToken {
         observer.complete();
       });
     }
+  }
+
+  static _getAjaxConnection(userToken: string, refreshToken: boolean): Observable<AjaxResponse> {
+    let createXHR = function() {
+      return new XMLHttpRequest();
+    };
+    return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } });
   }
 }

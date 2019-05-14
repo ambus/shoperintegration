@@ -44,8 +44,11 @@ describe("Konfiguracja - domyślne wartości", () => {
     expect(config.log4js).toBeDefined();
     expect(config.configurationType).toEqual("default");
     expect(config.encoding).toEqual("utf8");
+    expect(config.shoperConfig).toBeDefined();
+    expect(config.shoperConfig.delayTimeInMilisec).toBeDefined();
     done();
   });
+
   afterAll(() => {
     fs.renameSync(`test${TEST_CONFIG_FILE_PATH}`, TEST_CONFIG_FILE_PATH);
   });

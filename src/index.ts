@@ -3,6 +3,7 @@ import { Config } from "./config/config";
 import { FileWatcher } from "./file-watcher/file-watcher";
 import { retryWhen, tap, delayWhen, mergeMap, concatMap, delay } from "rxjs/operators";
 import { timer, Observable, iif, throwError, of } from "rxjs";
+import { FilonMerchandise } from "./models/filon-merchandise";
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -56,12 +57,12 @@ export class Index {
         err => {}
       );
   }
-  parseData(data: string): any {
-    console.warn("TODO parse string to javascript opbject");
+  parseData(data: string): FilonMerchandise[] {
+    // console.warn("TODO parse string to javascript opbject");
 
-    return {};
+    return undefined;
   }
-  sendDataToShoper(parsedData: {}): void {
+  sendDataToShoper(filonMerchandises: FilonMerchandise[]): void {
     console.warn("TODO send parsed data do shoper");
   }
 }

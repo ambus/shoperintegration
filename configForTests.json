@@ -39,8 +39,11 @@
         "urls": {
             "token": "",
             "productStocks": "",
-            "products": ""
+            "products": "",
+            "productStocksUpdate": ""
         },
-        "userToken": ""
+        "userToken": "",
+        "delayTimeInMilisec": 1000,
+        "maxRetryAttempts": 3
     }
 }
