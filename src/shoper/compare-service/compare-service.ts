@@ -21,7 +21,7 @@ export class CompareService {
           return task;
         }),
         catchError((err: any, caught: Observable<Task>) => {
-          this.logger.error(`Napotkano błąd podczas generowania obiektu do akutalizacji w shoperze`, err, taskToUpdate);
+          this.logger.error(`Napotkano błąd podczas generowania obiektu do aktualizacji w shoperze`, err, taskToUpdate);
           return throwError(new ErrorTask(taskToUpdate || err, err));
         })
       );
