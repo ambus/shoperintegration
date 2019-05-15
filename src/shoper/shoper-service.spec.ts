@@ -97,7 +97,6 @@ describe("shoperService", () => {
   it("po dodaniu towaru do strumienia powinien pojawić się wykonany task w strumieniu zakończonych zadań", done => {
     let stock = Math.round(Math.random() * 100);
     shoperService.doneTask$.subscribe((val: Task) => {
-      console.warn(val)
       expect(val.shoperStock).toBeDefined();
       expect(val.shoperStock).toBe(shoperStockMockup.response.list[0]);
       expect(val.shoperConnectionTokenID).toBeDefined();
