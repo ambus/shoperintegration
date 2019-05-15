@@ -21,6 +21,9 @@ export class Index {
     this.init(configFileName);
     this.fw = new FileWatcher();
     this.shoperService = new ShoperService(this.config);
+    this.shoperService.doneTask$.subscribe(task => {
+      this.logger.info("Zakończono wykonywanie taska", task);
+    });
   }
 
   init(configFileName: string): void {
@@ -52,7 +55,7 @@ export class Index {
         tap(val => this.logger.debug("Nowe dane w strumieniu", val)),
         this.retryPipeline,
         parseCSVDataStream(this.config.parserOptions),
-        replaceCommaInPrice(),
+        replaceCommaInPrice()
       )
       .subscribe(
         (filonMerchandises: FilonMerchandise[]) => {
