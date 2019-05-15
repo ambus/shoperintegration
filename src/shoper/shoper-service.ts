@@ -38,6 +38,7 @@ export class ShoperService {
   }
 
   _taskRequest$: Observable<Task> = this.filonMerchandiseAdd$.pipe(
+    tap((filonMerchandise: FilonMerchandise) => this.logger.debug("Dodano nowy towar do strumienia tasków", filonMerchandise)),
     map(createTaskRequest),
     share()
   );
@@ -79,6 +80,7 @@ export class ShoperService {
         ),
         map((val: { outerValue: Task; innerValue: string; outerIndex: number; innerIndex: number }) => {
           val.outerValue.shoperConnectionTokenID = val.innerValue;
+          this.logger.debug(`Pobrany token połączenia: ${val.innerValue}`);
           return val.outerValue;
         }),
         catchError(err => {
