@@ -1,15 +1,13 @@
-import { Config } from "../../config/config";
+import { getLogger, Logger } from "log4js";
 import { Observable, OperatorFunction, throwError } from "rxjs";
-import { ShoperStock } from "../../models/shoper-stock";
-import { AjaxResponse, ajax } from "rxjs/ajax";
-import { map, tap, retryWhen, switchMap, catchError } from "rxjs/operators";
-import { retryStrategy } from "../utils/retry-strategy";
-import { ShoperReturnList } from "../../models/shoper-return-list";
-import { AnonymousSubject } from "rxjs/internal/Subject";
-import { Task } from "../../models/task";
-import { shoperStockMockup } from "../../../test/mockup/shoper-stock.mockup";
+import { ajax, AjaxResponse } from "rxjs/ajax";
+import { catchError, map, retryWhen, switchMap, tap } from "rxjs/operators";
+import { XMLHttpRequest } from 'xmlhttprequest';
+import { Config } from "../../config/config";
 import { ErrorTask } from "../../models/error-task";
-import { Logger, getLogger } from "log4js";
+import { ShoperStock } from "../../models/shoper-stock";
+import { Task } from "../../models/task";
+import { retryStrategy } from "../utils/retry-strategy";
 
 export class ShoperStockService {
   config: Config;
@@ -37,7 +35,7 @@ export class ShoperStockService {
       return new XMLHttpRequest();
     };
     let url = `${this.config.shoperConfig.urls.productStocks}?filters={"code":"${itemCode}"}`;
-    return ajax({ createXHR, url: url, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } });
+    return ajax({ createXHR, url: url, crossDomain: true, withCredentials: false, method: "GET", headers: { Authorization: `Bearer ${userToken}` } });
   }
 
   setShoperStock(): OperatorFunction<Task, Task> {
@@ -56,6 +54,7 @@ export class ShoperStockService {
         ),
         map((val: { outerValue: Task; innerValue: ShoperStock; outerIndex: number; innerIndex: number }) => {
           val.outerValue.shoperStock = val.innerValue;
+          this.logger.debug(`Pobrano dane shoperStock`, val.innerValue, 'dla taska:', val.outerValue);
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {
