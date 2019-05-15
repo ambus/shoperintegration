@@ -60,8 +60,8 @@ export class ShoperUpdateService {
           })
         ),
         map((val: { outerValue: Task; innerValue: number; outerIndex: number; innerIndex: number }) => {
-          this.logger.info(`Status aktualizacji towaru: ${val.innerValue}, Task: `, val.outerValue);
           val.outerValue.updateStatus = val.innerValue;
+          this.logger.info(`Status aktualizacji towaru: ${val.innerValue}, Task: `, val.outerValue);
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {
