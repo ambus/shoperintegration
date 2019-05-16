@@ -2,7 +2,7 @@ import { getLogger, Logger } from "log4js";
 import { Observable, OperatorFunction, throwError } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { catchError, map, retryWhen, switchMap, tap } from "rxjs/operators";
-import { XMLHttpRequest } from 'xmlhttprequest';
+import { XMLHttpRequest } from "xmlhttprequest";
 import { Config } from "../../config/config";
 import { ErrorTask } from "../../models/error-task";
 import { ShoperStock } from "../../models/shoper-stock";
@@ -54,7 +54,7 @@ export class ShoperStockService {
         ),
         map((val: { outerValue: Task; innerValue: ShoperStock; outerIndex: number; innerIndex: number }) => {
           val.outerValue.shoperStock = val.innerValue;
-          this.logger.debug(`Pobrano dane shoperStock`, val.innerValue, 'dla taska:', val.outerValue);
+          this.logger.debug(`Pobrano dane shoperStock`, val.innerValue, "dla taska:", val.outerValue);
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {
