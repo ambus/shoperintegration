@@ -4,6 +4,7 @@ import { ConfigElement } from "../models/config-element";
 import { ParserOptions } from "../models/parser-options";
 import { FileInfo } from "../models/file-info";
 import { ShoperConfig } from "../models/shoper-config";
+import { SMTPConfig } from "../models/smtp-config";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
 
@@ -18,6 +19,7 @@ export class Config {
   public errorDelayTime: number;
   public attempsWhenError: number;
   public shoperConfig: ShoperConfig;
+  public smtpConfig: SMTPConfig;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -43,6 +45,7 @@ export class Config {
       this.errorDelayTime = config.errorDelayTime;
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
+      this.smtpConfig = config.smtpConfig;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
@@ -54,6 +57,7 @@ export class Config {
       this.errorDelayTime = config.errorDelayTime;
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
+      this.smtpConfig = config.smtpConfig;
     }
   }
 
@@ -93,6 +97,14 @@ export class Config {
         userToken: "",
         delayTimeInMilisec: 800,
         maxRetryAttempts: 3
+      },
+      smtpConfig: {
+        host: "",
+        secure: undefined,
+        port: undefined,
+        auth: { user: "", pass: "" },
+        ignoreTLS: true,
+        tls: { rejectUnauthorized: false } // do not fail on invalid certs
       }
     };
   }

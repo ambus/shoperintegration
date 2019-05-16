@@ -45,5 +45,16 @@
         "userToken": "",
         "delayTimeInMilisec": 1000,
         "maxRetryAttempts": 3
+    },
+    "smtpConfig": {
+        "host": "",
+        "auth": {
+            "user": "",
+            "pass": ""
+        },
+        "ignoreTLS": true,
+        "tls": {
+            "rejectUnauthorized": false
+        }
     }
 }
