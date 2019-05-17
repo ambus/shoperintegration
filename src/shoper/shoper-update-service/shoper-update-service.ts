@@ -1,12 +1,13 @@
+import { getLogger, Logger } from "log4js";
+import { Observable, of, OperatorFunction, throwError } from "rxjs";
+import { ajax, AjaxResponse } from "rxjs/ajax";
+import { catchError, map, retryWhen, switchMap, tap } from "rxjs/operators";
+import { XMLHttpRequest } from "xmlhttprequest";
+import { shoperUpdateStock } from "../../../test/mockup/shoper-update.mockup";
 import { Config } from "../../config/config";
-import { Logger, getLogger } from "log4js";
-import { Observable, OperatorFunction, throwError } from "rxjs";
-import { AjaxResponse, ajax } from "rxjs/ajax";
-import { Task } from "../../models/task";
-import { map, retryWhen, tap, switchMap, catchError } from "rxjs/operators";
-import { retryStrategy } from "../utils/retry-strategy";
 import { ErrorTask } from "../../models/error-task";
-import { TaskShoperRequestStatusValue } from "../../models/task-shoper-request-status-value";
+import { Task } from "../../models/task";
+import { retryStrategy } from "../utils/retry-strategy";
 
 export class ShoperUpdateService {
   config: Config;
@@ -33,16 +34,26 @@ export class ShoperUpdateService {
     let createXHR = function() {
       return new XMLHttpRequest();
     };
-    let url = `${this.config.shoperConfig.urls.productStocksUpdate}/${task.shoperStock.stock_id}`;
-    return ajax({
-      createXHR,
-      url: url,
-      crossDomain: true,
-      withCredentials: false,
-      method: "PUT",
-      headers: { Authorization: `Basic ${userToken}`, "Content-Type": "application/json" },
-      body: task.stockToUpdate || {}
-    });
+    if (task.shoperStock && task.shoperStock.stock_id) {
+      let url = `${this.config.shoperConfig.urls.productStocks}/${task.shoperStock.stock_id}`;
+      if (task.shoperStock.stock_id === "310") {
+        console.error("Powinien iść update do shopera", url, task.stockToUpdate);
+        return ajax({
+          createXHR,
+          url: url,
+          crossDomain: true,
+          withCredentials: false,
+          method: "PUT",
+          headers: { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" },
+          body: task.stockToUpdate || {}
+        });
+      } else {
+        console.warn("idzie sztuczny update do shopera", url, task.stockToUpdate);
+        return of(shoperUpdateStock);
+      }
+    } else {
+      return throwError("Nie można pobrać danych z shopera na temat nieznanego towaru");
+    }
   }
 
   updateShoperStock(): OperatorFunction<Task, Task> {
