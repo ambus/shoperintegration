@@ -23,7 +23,7 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
     - [X] if task always return error send @ to specific persons - from config
     - [X] get item form shoper to compare
     - [X] send new data to shoper
-* [ ] fix email message when stream catch error and complite stream
+* [X] fix email message when stream catch error and complite stream
 * [ ] fix email sendMessage - inside use SendMessageObservable
 * [ ] add info about version on tag (like lazygit repo)
 * [ ] more..
