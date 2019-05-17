@@ -124,7 +124,7 @@ export class ShoperService {
                   <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task)}</code></pre></p>
                   <p>Treść błędu: ${JSON.stringify(task["message"])}</p>
                   <br />
-                  <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task["message"])}</code></pre></p>
+                  <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task)}</code></pre></p>
                   `;
                   this.eMail.sendMail(`🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticicationList.alerts);
                 })
@@ -152,7 +152,7 @@ export class ShoperService {
       <br />
       <p>Treść błędu: ${JSON.stringify(err)}</p>
       `;
-      this.eMail.sendMail(`Wstrzymano działanie strumienia!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
+      this.eMail.sendMail(`🔥🔥 Wstrzymano działanie strumienia!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
       return throwError(err);
     }),
     finalize(() => {
