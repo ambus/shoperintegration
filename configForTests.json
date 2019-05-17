@@ -60,5 +60,8 @@
     "emailNoticicationList": {
         "alerts": [],
         "adminsNotifications": []
+    },
+    "backup": {
+        "filelocation": "./tmp/backup"
     }
 }

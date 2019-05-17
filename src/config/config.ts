@@ -6,6 +6,7 @@ import { FileInfo } from "../models/file-info";
 import { ShoperConfig } from "../models/shoper-config";
 import { SMTPConfig } from "../models/smtp-config";
 import { EmailNoticicationList } from "../models/email-notifications-list";
+import { BackupConfig } from "../models/backup-config";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
 
@@ -22,6 +23,7 @@ export class Config {
   public shoperConfig: ShoperConfig;
   public smtpConfig: SMTPConfig;
   public emailNoticicationList: EmailNoticicationList;
+  public backup: BackupConfig;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -49,6 +51,7 @@ export class Config {
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
       this.emailNoticicationList = config.emailNoticicationList;
+      this.backup = config.backup;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
@@ -62,6 +65,7 @@ export class Config {
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
       this.emailNoticicationList = config.emailNoticicationList;
+      this.backup = config.backup;
     }
   }
 
@@ -113,6 +117,9 @@ export class Config {
       emailNoticicationList: {
         alerts: [],
         adminsNotifications: []
+      },
+      backup: {
+        filelocation: "./"
       }
     };
   }

@@ -4,6 +4,7 @@ import { FileInfo } from "./file-info";
 import { ShoperConfig } from "./shoper-config";
 import { SMTPConfig } from "./smtp-config";
 import { EmailNoticicationList } from "./email-notifications-list";
+import { BackupConfig } from "./backup-config";
 
 export type ConfigElement = {
   log4js: Configuration;
@@ -16,4 +17,5 @@ export type ConfigElement = {
   shoperConfig: ShoperConfig;
   smtpConfig: SMTPConfig;
   emailNoticicationList: EmailNoticicationList;
+  backup: BackupConfig;
 };
