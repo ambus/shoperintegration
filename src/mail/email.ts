@@ -8,12 +8,12 @@ import nodemailer = require("nodemailer");
 import { Logger, getLogger } from "log4js";
 
 export class EMail {
-  transporter: Mail;
-  logger: Logger;
+  private _transporter: Mail;
+  private _logger: Logger;
 
   constructor(config: Config) {
-    (this.logger = getLogger("EMail")),
-      (this.transporter = nodemailer.createTransport(
+    (this._logger = getLogger("EMail")),
+      (this._transporter = nodemailer.createTransport(
         smtpTransport({
           host: config.smtpConfig.host,
           secure: config.smtpConfig.secure,
@@ -26,41 +26,42 @@ export class EMail {
   }
 
   sendMail(subject: string = "Wiadomość od boota serwisu ShoperService", message: string = "Cześć 😀", messageHtml: string = "", mailTo: Array<string> = [""], ...args: any) {
-      const mailOptions: Mail.Options = {
-        from: "ERP - ShoperService boot 👻<erp-helpdesk@kim24.pl>",
-        to: mailTo,
-        subject: subject,
-        text: message,
-        html: messageHtml
-      };
-      this.transporter.sendMail(mailOptions, (err, info: SMTPTransport.SentMessageInfo) => {
-        if (err) {
-          this.logger.error("Błąd podczas wysyłania maila", err);
-        } else {
-          this.logger.log(`Wysłano wiadomość: ${subject} do ${mailTo}. Status: `, info);
-        }
-      });
+    this.sendMailObservable(subject, message, messageHtml, mailTo).subscribe();
   }
 
-  sendMailObservable(subject: string = "Wiadomość od boota serwisu ShoperService", message: string = "Cześć 😀", messageHtml: string = "", mailTo: Array<string> = [""], ...args: any): Observable<SMTPTransport.SentMessageInfo> {
+  sendMailObservable(
+    subject: string = "Wiadomość od boota serwisu ShoperService",
+    message: string = "Cześć 😀",
+    messageHtml: string = "",
+    mailTo: Array<string>,
+    ...args: any
+  ): Observable<SMTPTransport.SentMessageInfo> {
     return Observable.create((observer: AnonymousSubject<SMTPTransport.SentMessageInfo>) => {
-      const mailOptions: Mail.Options = {
-        from: "ERP - ShoperService boot 👻<erp-helpdesk@kim24.pl>",
-        to: mailTo,
-        subject: subject,
-        text: message,
-        html: messageHtml
-      };
-      this.transporter.sendMail(mailOptions, (err, info: SMTPTransport.SentMessageInfo) => {
-        if (err) {
-          this.logger.error("Błąd podczas wysyłania maila", err);
-          observer.error(err);
-        } else {
-          this.logger.log(`Wysłano wiadomość: ${subject} do ${mailTo}. Status: `, info);
-          observer.next(info);
-          observer.complete();
-        }
-      });
+      if (!mailTo || mailTo.length <= 0) {
+        observer.error("Brak odbiorców wiadomości");
+      } else {
+        const mailOptions: Mail.Options = {
+          from: "ERP - ShoperService boot 👻<erp-helpdesk@kim24.pl>",
+          to: mailTo,
+          subject: subject,
+          text: message,
+          html: messageHtml
+        };
+        this._transporterSendMail(mailOptions, observer);
+      }
+    });
+  }
+
+  _transporterSendMail(mailOptions: Mail.Options, observer: AnonymousSubject<SMTPTransport.SentMessageInfo>): void {
+    this._transporter.sendMail(mailOptions, (err, info: SMTPTransport.SentMessageInfo) => {
+      if (err) {
+        this._logger.error("Błąd podczas wysyłania maila", err);
+        observer.error(err);
+      } else {
+        this._logger.log(`Wysłano wiadomość: ${mailOptions.subject} do ${mailOptions.to}. Status: `, info);
+        observer.next(info);
+        observer.complete();
+      }
     });
   }
 }
