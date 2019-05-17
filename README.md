@@ -25,6 +25,7 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
     - [X] send new data to shoper
 * [X] fix email message when stream catch error and complite stream
 * [X] fix email sendMessage - inside use SendMessageObservable
+* [ ] add backup file wher will be insert data read from local file
 * [ ] add sending daily reports (node-schedule)
 * [ ] add info about version on tag (like lazygit repo)
 * [ ] more..
