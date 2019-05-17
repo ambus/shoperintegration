@@ -48,14 +48,16 @@
     },
     "smtpConfig": {
         "host": "",
+        "port": 587,
+        "sercure": false,
         "auth": {
             "user": "",
             "pass": ""
         },
         "ignoreTLS": true,
         "tls": {
-            "rejectUnauthorized": false
-        }
+            "ciphers": "SSLv3"
+          }
     },
     "emailNoticicationList": {
         "alerts": [],

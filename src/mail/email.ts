@@ -19,7 +19,7 @@ export class EMail {
           secure: config.smtpConfig.secure,
           port: config.smtpConfig.port,
           auth: config.smtpConfig.auth,
-          // ignoreTLS: false,
+          ignoreTLS: config.smtpConfig.ignoreTLS,
           tls: config.smtpConfig.tls
         })
       ));
@@ -56,7 +56,8 @@ export class EMail {
     this._transporter.sendMail(mailOptions, (err, info: SMTPTransport.SentMessageInfo) => {
       if (err) {
         this._logger.error("Błąd podczas wysyłania maila", err);
-        observer.error(err);
+        // observer.next(err);
+        observer.complete();
       } else {
         this._logger.log(`Wysłano wiadomość: ${mailOptions.subject} do ${mailOptions.to}. Status: `, info);
         observer.next(info);

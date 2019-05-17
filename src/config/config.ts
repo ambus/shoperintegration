@@ -108,11 +108,15 @@ export class Config {
       },
       smtpConfig: {
         host: "",
-        secure: undefined,
-        port: undefined,
-        auth: { user: "", pass: "" },
+        port: 587,
+        auth: {
+          user: "",
+          pass: ""
+        },
         ignoreTLS: true,
-        tls: { rejectUnauthorized: false }
+        tls: {
+          ciphers: "SSLv3"
+        }
       },
       emailNoticicationList: {
         alerts: [],
