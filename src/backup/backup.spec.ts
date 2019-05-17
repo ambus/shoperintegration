@@ -67,7 +67,7 @@ describe("backup", () => {
       )
       .subscribe((stream: string) => {
         fs.readFile(backup.backupFileName, Config.getInstance().encoding, (err: Error, data: string) => {
-          let expectedString = `${CSVFileMockup}${CSVFileMockup.replace("product_code;stock;price", "")}`;
+          let expectedString = `${CSVFileMockup}${CSVFileMockup.replace("product_code;stock;price;priceE", "")}`;
           fs.unlinkSync(backup.backupFileName);
           expect(data).toBe(expectedString);
           done();

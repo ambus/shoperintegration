@@ -19,7 +19,7 @@ export class Backup {
         map((filonMerchandisesString: string) => {
           let stringToSave = filonMerchandisesString;
           if (fs.existsSync(this.backupFileName)) {
-            stringToSave = filonMerchandisesString.replace("product_code;stock;price", "");
+            stringToSave = filonMerchandisesString.replace("product_code;stock;price;priceE", "");
           }
           fs.appendFileSync(this.backupFileName, stringToSave, { encoding: "utf8" });
           return filonMerchandisesString;
