@@ -31,7 +31,10 @@ describe("backup", () => {
     });
   });
 
-  it("po wpięciu w strumień i przekazaniu danych powienien utworzyć plik który w nazwie ma dzisiejszą datę", done => {
+  it("po wpięciu w strumień i przekazaniu danych powienien utworzyć plik do którego umieści dane", done => {
+    let filename = `tmp/backup/${stringGenerator()}.bac`;
+
+    let spyFunction = jest.spyOn(backup, "backupFileName", "get").mockReturnValue(filename);
     let stream = new Subject<string>();
     if (fs.existsSync(backup.backupFileName)) {
       fs.unlinkSync(backup.backupFileName);
