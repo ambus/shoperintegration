@@ -36,21 +36,15 @@ export class ShoperUpdateService {
     };
     if (task.shoperStock && task.shoperStock.stock_id) {
       let url = `${this.config.shoperConfig.urls.productStocks}/${task.shoperStock.stock_id}`;
-      if (task.shoperStock.stock_id === "310") {
-        console.error("Powinien iść update do shopera", url, task.stockToUpdate);
-        return ajax({
-          createXHR,
-          url: url,
-          crossDomain: true,
-          withCredentials: false,
-          method: "PUT",
-          headers: { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" },
-          body: task.stockToUpdate || {}
-        });
-      } else {
-        console.warn("idzie sztuczny update do shopera", url, task.stockToUpdate);
-        return of(shoperUpdateStock);
-      }
+      return ajax({
+        createXHR,
+        url: url,
+        crossDomain: true,
+        withCredentials: false,
+        method: "PUT",
+        headers: { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" },
+        body: task.stockToUpdate || {}
+      });
     } else {
       return throwError("Nie można pobrać danych z shopera na temat nieznanego towaru");
     }
