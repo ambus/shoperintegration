@@ -107,7 +107,7 @@ export class ShoperService {
               of(task).pipe(
                 tap((request: Task) => this.logger.error(`Nie udało się wykonać zadania o id ${request.id}.`)),
                 tap((task: Task) => {
-                  this.logger.error("Próba wysłania maila")
+                  this.logger.error("Próba wysłania maila");
                   let message = `Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${
                     task.filonMerchandise.product_code
                   }, napotkano błąd. Prawdopodobnie dane który miały zostać zakutalizowane nie zostały przesłane na serwer. Prosimy o ręczną aktualizację ponieważ dane które są w systemie shoper nie będą odpowiadały prawdzie. Z programu Filon otrzymano dane(kod, ilość, cena, cenaE): ${
@@ -116,9 +116,9 @@ export class ShoperService {
                     task
                   )}. Treść błędu: ${task["message"]}`;
                   let messageHtml = `<h2>Błąd</h2>
-                  <h3>Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${task.filonMerchandise.product_code}, napotkano błąd!</h3>
-                  <p>Prawdopodobnie dane który miały zostać zakutalizowane nie zostały przesłane na serwer.</p>
-                  <p style="color: red">Prosimy o ręczną aktualizację ponieważ dane które są w systemie shoper nie będą odpowiadały prawdzie.</p>
+                  <h3>Podczas próby aktualizacji towaru o symbolu ${task.filonMerchandise.product_code}, napotkano błąd!</h3>
+                  <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
+                  <p style="color: red">Prosimy o ręczną aktualizację!</p>
                   <p style="">Z programu Filon otrzymano dane: <pre>
                   <code>${JSON.stringify(task.filonMerchandise, null, 4)}</code></pre></p>
                   <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task)}</code></pre></p>
@@ -126,7 +126,7 @@ export class ShoperService {
                   <br />
                   <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task["message"])}</code></pre></p>
                   `;
-                  this.eMail.sendMail(`Nie można ukończyć zadania aktualizacji danych towaru ${task.filonMerchandise.product_code}`, message, messageHtml, ["s.standarski@kim24.pl"]);
+                  this.eMail.sendMail(`🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticicationList.alerts);
                 })
               ),
               of(task).pipe(setStatus(TaskShoperRequestStatusValue.done))
@@ -142,11 +142,27 @@ export class ShoperService {
     tap((request: Task) => this.connectionPoolIsFree$.next()),
     catchError(err => {
       this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
-
-      this.eMail.sendMail("Nie można ukończyć zadania aktualizacji danych towaru - strumień został wstrzymany i jest niezbędny jego restart", err);
+      let message = `Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd. Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.
+      Napotkany błąd spowodował zakończenie strumienia. Niezbędny jest restart serwisu oraz ręczna aktualizacja danych w systemie shoper!. Treść błędu: ${JSON.stringify(err)}`;
+      let messageHtml = `<h2>Błąd</h2>
+      <h3>Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd!</h3>
+      <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
+      <p style="color: red">Prosimy o ręczną aktualizację!</p>
+      <p style="color: red">Napotkany błąd spowodował zakończenie strumienia. Niezbędny jest restart serwisu!</p>
+      <br />
+      <p>Treść błędu: ${JSON.stringify(err)}</p>
+      `;
+      this.eMail.sendMail(`Wstrzymano działanie strumienia!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
       return throwError(err);
     }),
-    finalize(() => this.logger.error("Strumień zakończył pracę")) //TODO ten strumień nie powinien nigdy zakończyć pracy. Wysłać @ lub smsa z powiadomieniem o napotkanym zakończeniu działania
+    finalize(() => {
+      this.logger.error("Strumień zakończył pracę");
+      let message = `Serwer wstrzymał pracę - potrzebny jest restart`;
+      let messageHtml = `<h2 style="color: red">Błąd krytyczny</h2>
+    <h3>Serwer wstrzymał pracę - potrzebny jest restart!</h3>
+    `;
+      this.eMail.sendMail(`🔥🔥🔥 Serwer wstrzymał pracę - potrzebny jest restart!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
+    })
   );
 
   endTask(): OperatorFunction<Task, Task> {
