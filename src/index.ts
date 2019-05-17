@@ -7,6 +7,7 @@ import { FileWatcher } from "./file-watcher/file-watcher";
 import { FilonMerchandise } from "./models/filon-merchandise";
 import { replaceCommaInPrice } from "./replace-comma/replace-comma";
 import { ShoperService } from "./shoper/shoper-service";
+import { EMail } from "./mail/email";
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -16,6 +17,7 @@ export class Index {
   fw: FileWatcher = new FileWatcher();
   readFileOnStart: boolean = true;
   shoperService: ShoperService;
+  eMail: EMail;
 
   constructor(configFileName: string) {
     this.init(configFileName);
@@ -24,6 +26,12 @@ export class Index {
     this.shoperService.doneTask$.subscribe(task => {
       this.logger.info("Zakończono wykonywanie taska", task);
     });
+    this.eMail = new EMail(this.config);
+    let message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticicationList.adminsNotifications}`;
+    let messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${
+      this.config.emailNoticicationList.adminsNotifications
+    }</p><b>Życzymy miłego dnia 😀</b>`;
+    this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, this.config.emailNoticicationList.alerts);
   }
 
   init(configFileName: string): void {
