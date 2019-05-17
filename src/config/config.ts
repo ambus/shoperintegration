@@ -5,6 +5,7 @@ import { ParserOptions } from "../models/parser-options";
 import { FileInfo } from "../models/file-info";
 import { ShoperConfig } from "../models/shoper-config";
 import { SMTPConfig } from "../models/smtp-config";
+import { EmailNoticicationList } from "../models/email-notifications-list";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
 
@@ -20,6 +21,7 @@ export class Config {
   public attempsWhenError: number;
   public shoperConfig: ShoperConfig;
   public smtpConfig: SMTPConfig;
+  public emailNoticicationList: EmailNoticicationList;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -46,6 +48,7 @@ export class Config {
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
+      this.emailNoticicationList = config.emailNoticicationList;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
@@ -58,6 +61,7 @@ export class Config {
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
+      this.emailNoticicationList = config.emailNoticicationList;
     }
   }
 
@@ -104,7 +108,11 @@ export class Config {
         port: undefined,
         auth: { user: "", pass: "" },
         ignoreTLS: true,
-        tls: { rejectUnauthorized: false } // do not fail on invalid certs
+        tls: { rejectUnauthorized: false }
+      },
+      emailNoticicationList: {
+        alerts: [],
+        adminsNotifications: []
       }
     };
   }

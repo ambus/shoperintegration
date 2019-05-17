@@ -56,5 +56,9 @@
         "tls": {
             "rejectUnauthorized": false
         }
+    },
+    "emailNoticicationList": {
+        "alerts": [],
+        "adminsNotifications": []
     }
 }

@@ -3,6 +3,7 @@ import { ParserOptions } from "./parser-options";
 import { FileInfo } from "./file-info";
 import { ShoperConfig } from "./shoper-config";
 import { SMTPConfig } from "./smtp-config";
+import { EmailNoticicationList } from "./email-notifications-list";
 
 export type ConfigElement = {
   log4js: Configuration;
@@ -14,4 +15,5 @@ export type ConfigElement = {
   attempsWhenError: number;
   shoperConfig: ShoperConfig;
   smtpConfig: SMTPConfig;
+  emailNoticicationList: EmailNoticicationList;
 };
