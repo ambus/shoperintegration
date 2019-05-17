@@ -20,10 +20,13 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
     - [x] get the connection token
     - [x] retry if catch error
     - [X] if catch error retry run task the specified numbers of times
-    - [ ] if task always return error send @ to specific persons - from config
-    - [ ] get item form shoper to compare
-    - [ ] compare item form shoper with item from input file
-    - [ ] if there are differenct send new data to shoper
+    - [X] if task always return error send @ to specific persons - from config
+    - [X] get item form shoper to compare
+    - [X] send new data to shoper
+* [X] fix email message when stream catch error and complite stream
+* [X] fix email sendMessage - inside use SendMessageObservable
+* [ ] add backup file wher will be insert data read from local file
+* [ ] add sending daily reports (node-schedule)
 * [ ] add info about version on tag (like lazygit repo)
 * [ ] more..
 
