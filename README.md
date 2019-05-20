@@ -28,6 +28,7 @@ Shoperintergration must communicate with the old DOS app. Communication will be 
 * [X] add backup file wher will be insert data read from local file
 * [ ] fix tests
 * [ ] add sending daily reports (node-schedule)
+* [X] add gulp task's
 * [ ] add info about version on tag (like lazygit repo)
 * [ ] more..
 
