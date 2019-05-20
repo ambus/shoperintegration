@@ -62,3 +62,4 @@ src/styles.css
 
 # config
 config.json
+gulpfile.conf.ts
