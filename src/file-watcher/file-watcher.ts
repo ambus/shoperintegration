@@ -5,14 +5,17 @@ import * as fs from "fs";
 import { watch } from "chokidar";
 import { Config } from "../config/config";
 import { AnonymousSubject } from "rxjs/internal/Subject";
+import { EMail } from "../mail/email";
 
 export class FileWatcher {
   public logger: Logger;
   private config: Config;
+  private eMail: EMail;
 
   constructor() {
-    this.logger = getLogger('fileWatcher');
+    this.logger = getLogger("fileWatcher");
     this.config = Config.getInstance();
+    this.eMail = new EMail(this.config);
   }
 
   public startWatch(filePath: string, fileName: string, readOnStart: boolean): Observable<string> {
@@ -20,7 +23,7 @@ export class FileWatcher {
       this.logger.debug(`Start obserwowania pliku ${filePath}/${fileName}`);
       try {
         if (readOnStart) {
-          this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
+          this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer, false);
         }
         this.watchFile(filePath)
           .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
@@ -34,14 +37,30 @@ export class FileWatcher {
     });
   }
 
-  public readFileAndSendThemToStream(filePath: string, stream: Subject<string>): void {
+  public readFileAndSendThemToStream(filePath: string, stream: Subject<string>, sendEmail: boolean = true): void {
     this.readFile(filePath)
       .pipe(
         tap(val => this.logger.info("Odczytano nowe dane")),
         retry(5),
         tap(() => this.deleteFile(filePath))
       )
-      .subscribe((res: string) => stream.next(res), (err: any) => this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err));
+      .subscribe(
+        (res: string) => stream.next(res),
+        (err: any) => {
+          if (sendEmail) {
+            this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err);
+            let message = `Podczas próby odczyty pliku ${filePath}, napotkano błąd. Treść błędu: ${err}`;
+            let messageHtml = `<h2>Błąd</h2>
+            <h3>Błąd podczas odczytu pliku ${filePath}, napotkano błąd!</h3>
+            <p style="">Treść błędu 
+            <pre><code>${err}</code></pre>
+            </p>
+            <br />
+            `;
+            this.eMail.sendMail(`🔥Nie można odczytać pliku ${filePath}`, message, messageHtml, this.config.emailNoticicationList.alerts);
+          }
+        }
+      );
   }
 
   public readFile(filePath: string): Observable<string> {
@@ -50,10 +69,12 @@ export class FileWatcher {
         if (err) {
           this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
           observer.error(err);
+          observer.complete();
+        } else {
+          this.logger.info(`Odczytano nowe dane:`, data);
+          observer.next(data);
+          observer.complete();
         }
-        this.logger.info(`Odczytano nowe dane:`, data);
-        observer.next(data);
-        observer.complete();
       });
     });
   }
