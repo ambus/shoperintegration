@@ -1,4 +1,5 @@
 export type SMTPConfig = {
+  from: string,
   host: string;
   secure?: boolean;
   port?: number;

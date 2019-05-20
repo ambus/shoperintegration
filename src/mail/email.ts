@@ -10,8 +10,10 @@ import { Logger, getLogger } from "log4js";
 export class EMail {
   private _transporter: Mail;
   private _logger: Logger;
+  private _config: Config;
 
   constructor(config: Config) {
+    this._config = config;
     (this._logger = getLogger("EMail")),
       (this._transporter = nodemailer.createTransport(
         smtpTransport({
@@ -41,7 +43,7 @@ export class EMail {
         observer.error("Brak odbiorców wiadomości");
       } else {
         const mailOptions: Mail.Options = {
-          from: "ERP - ShoperService boot 👻<erp-helpdesk@kim24.pl>",
+          from: this._config.smtpConfig.from,
           to: mailTo,
           subject: subject,
           text: message,

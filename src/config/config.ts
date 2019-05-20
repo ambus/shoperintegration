@@ -107,6 +107,7 @@ export class Config {
         maxRetryAttempts: 3
       },
       smtpConfig: {
+        from: "",
         host: "",
         port: 587,
         auth: {

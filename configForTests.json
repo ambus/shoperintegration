@@ -47,6 +47,7 @@
         "maxRetryAttempts": 3
     },
     "smtpConfig": {
+        "from": "",
         "host": "",
         "port": 587,
         "sercure": false,
