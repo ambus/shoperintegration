@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/ambus/shoperintegration/compare/v1.2.3...v1.3.0) (2019-05-20)
+
+
+### Features
+
+* **smtp:** rozbudowano konfigurację smtp ([27b1a6d](https://github.com/ambus/shoperintegration/commit/27b1a6d))
+
+
+
 ### [1.2.3](https://github.com/ambus/shoperintegration/compare/v1.2.2...v1.2.3) (2019-05-20)
 
 
