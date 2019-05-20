@@ -5,7 +5,7 @@ var sftp = require("gulp-sftp-up4");
 var del = require("del");
 
 function release() {
-  return del("./node_modules/.bin/standard-version");
+  return execFile("./node_modules/.bin/standard-version");
 }
 function cleanDistDirectory() {
   return del("./dist/**/*");
@@ -27,3 +27,4 @@ function dev_uploadFileFTP(cb: any) {
 }
 
 exports.dev_buildAndUpload = series(release, cleanDistDirectory, build, dev_uploadFileFTP);
+exports.release = series(release);
