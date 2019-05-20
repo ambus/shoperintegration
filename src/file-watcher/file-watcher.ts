@@ -25,7 +25,7 @@ export class FileWatcher {
         this.watchFile(filePath)
           .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
           .subscribe((path: string) => {
-            if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer);
+            if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, observer);
           });
       } catch (err) {
         this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie strumienia`, err);
