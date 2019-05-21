@@ -47,8 +47,8 @@ export class FileWatcher {
       .subscribe(
         (res: string) => stream.next(res),
         (err: any) => {
+          this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err);
           if (sendEmail) {
-            this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err);
             let message = `Podczas próby odczyty pliku ${filePath}, napotkano błąd. Treść błędu: ${err}`;
             let messageHtml = `<h2>Błąd</h2>
             <h3>Błąd podczas odczytu pliku ${filePath}, napotkano błąd!</h3>
