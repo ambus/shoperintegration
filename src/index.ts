@@ -68,7 +68,8 @@ export class Index {
         this.backup.addNewFilonData(),
         this.retryPipeline,
         parseCSVDataStream(this.config.parserOptions),
-        replaceCommaInPrice()
+        replaceCommaInPrice(),
+        replaceNotSupportedSight()
       )
       .subscribe(
         (filonMerchandises: FilonMerchandise[]) => {
