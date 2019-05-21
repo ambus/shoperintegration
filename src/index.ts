@@ -24,8 +24,6 @@ export class Index {
 
   constructor(configFileName: string) {
     this.init(configFileName);
-    console.warn(this.config)
-
     this.fw = new FileWatcher(this.config);
     this.shoperService = new ShoperService(this.config);
     this.shoperService.doneTask$.subscribe(task => {
