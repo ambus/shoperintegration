@@ -13,6 +13,7 @@ describe("email", () => {
 
   it("funkcja sendMail powinna wywoływać jej kopię ale implementującą strumienie", () => {
     let spySendMail = jest.spyOn(email, "sendMailObservable");
+    email._config.smtpConfig.status = true;
     email.sendMail("Wiadomość :)");
     expect(spySendMail).toBeCalled();
   });

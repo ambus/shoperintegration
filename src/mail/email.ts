@@ -10,7 +10,7 @@ import { Logger, getLogger } from "log4js";
 export class EMail {
   private _transporter: Mail;
   private _logger: Logger;
-  private _config: Config;
+  public _config: Config;
 
   constructor(config: Config) {
     this._config = config;
@@ -26,6 +26,7 @@ export class EMail {
         })
       ));
   }
+  
 
   sendMail(subject: string = "Wiadomość od boota serwisu ShoperService", message: string = "Cześć 😀", messageHtml: string = "", mailTo: Array<string> = [""], ...args: any) {
     if (this._config.smtpConfig.status) {
