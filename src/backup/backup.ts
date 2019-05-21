@@ -17,11 +17,13 @@ export class Backup {
     return (source: Observable<string>) => {
       return source.pipe(
         map((filonMerchandisesString: string) => {
-          let stringToSave = filonMerchandisesString;
-          if (fs.existsSync(this.backupFileName)) {
-            stringToSave = filonMerchandisesString.replace("product_code;stock;price;priceE", "");
+          if (this.config.backup.status) {
+            let stringToSave = filonMerchandisesString;
+            if (fs.existsSync(this.backupFileName)) {
+              stringToSave = filonMerchandisesString.replace("product_code;stock;price;priceE", "");
+            }
+            fs.appendFileSync(this.backupFileName, stringToSave, { encoding: "utf8" });
           }
-          fs.appendFileSync(this.backupFileName, stringToSave, { encoding: "utf8" });
           return filonMerchandisesString;
         }),
         catchError((err: any, caught: Observable<string>) => {

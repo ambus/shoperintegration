@@ -124,7 +124,8 @@ export class Config {
         adminsNotifications: []
       },
       backup: {
-        filelocation: "./"
+        filelocation: "./",
+        status: false
       }
     };
   }

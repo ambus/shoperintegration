@@ -65,6 +65,7 @@
         "adminsNotifications": []
     },
     "backup": {
-        "filelocation": "./tmp/backup"
+        "filelocation": "./tmp/backup",
+        "status": false
     }
 }
