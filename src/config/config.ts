@@ -117,7 +117,8 @@ export class Config {
         ignoreTLS: true,
         tls: {
           ciphers: "SSLv3"
-        }
+        },
+        status: false
       },
       emailNoticicationList: {
         alerts: [],

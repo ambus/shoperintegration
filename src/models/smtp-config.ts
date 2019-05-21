@@ -9,4 +9,5 @@ export type SMTPConfig = {
   };
   ignoreTLS?: boolean;
   tls: { rejectUnauthorized?: boolean; ciphers?: string };
+  status: boolean;
 };

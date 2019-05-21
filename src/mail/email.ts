@@ -28,7 +28,9 @@ export class EMail {
   }
 
   sendMail(subject: string = "Wiadomość od boota serwisu ShoperService", message: string = "Cześć 😀", messageHtml: string = "", mailTo: Array<string> = [""], ...args: any) {
-    this.sendMailObservable(subject, message, messageHtml, mailTo).subscribe();
+    if (this._config.smtpConfig.status) {
+      this.sendMailObservable(subject, message, messageHtml, mailTo).subscribe();
+    }
   }
 
   sendMailObservable(
