@@ -1,10 +1,9 @@
-import { Config } from "../config/config";
-import { Backup } from "./backup";
-import { Observable } from "rxjs";
-import { AnonymousSubject, Subject } from "rxjs/internal/Subject";
 import * as fs from "fs";
+import { Subject } from "rxjs/internal/Subject";
 import { CSVFileMockup } from "../../test/mockup/csv-file-mockup.mockup";
+import { Config } from "../config/config";
 import { stringGenerator } from "../lib/string-generator";
+import { Backup } from "./backup";
 
 describe("backup", () => {
   let backup: Backup;
@@ -33,7 +32,7 @@ describe("backup", () => {
 
   it("po wpięciu w strumień i przekazaniu danych powienien utworzyć plik do którego umieści dane", done => {
     let filename = `tmp/backup/${stringGenerator()}.bac`;
-
+  
     let spyFunction = jest.spyOn(backup, "backupFileName", "get").mockReturnValue(filename);
     let stream = new Subject<string>();
     if (fs.existsSync(backup.backupFileName)) {
