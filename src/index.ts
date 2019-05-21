@@ -9,13 +9,14 @@ import { replaceCommaInPrice } from "./replace-comma/replace-comma";
 import { ShoperService } from "./shoper/shoper-service";
 import { EMail } from "./mail/email";
 import { Backup } from "./backup/backup";
+import { replaceNotSupportedSight } from "./replace-notsupported-sight/replace-notsupported-sight";
 
 const CONFIG_FILE_NAME = "config.json";
 
 export class Index {
   logger: Logger;
   config: Config;
-  fw: FileWatcher = new FileWatcher();
+  fw: FileWatcher;
   readFileOnStart: boolean = true;
   shoperService: ShoperService;
   eMail: EMail;
@@ -23,7 +24,9 @@ export class Index {
 
   constructor(configFileName: string) {
     this.init(configFileName);
-    this.fw = new FileWatcher();
+    console.warn(this.config)
+
+    this.fw = new FileWatcher(this.config);
     this.shoperService = new ShoperService(this.config);
     this.shoperService.doneTask$.subscribe(task => {
       this.logger.info("Zakończono wykonywanie taska", task);

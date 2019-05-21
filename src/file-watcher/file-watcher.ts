@@ -12,9 +12,9 @@ export class FileWatcher {
   private config: Config;
   private eMail: EMail;
 
-  constructor() {
+  constructor(config: Config) {
     this.logger = getLogger("fileWatcher");
-    this.config = Config.getInstance();
+    this.config = config;
     this.eMail = new EMail(this.config);
   }
 

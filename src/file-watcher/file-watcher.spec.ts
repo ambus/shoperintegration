@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { stringGenerator } from "../lib/string-generator";
 import { Config } from "../config/config";
 import { AnonymousSubject } from "rxjs/internal/Subject";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 const EXAMPLE_DATA = `product_code;stock;price
 BUKWT2010;  41;110,0
@@ -18,8 +19,9 @@ beforeAll(() => {
 
 describe("FileWatcher", () => {
   let fileWatcher: FileWatcher;
+  let config = Config.getInstance(TEST_CONFIG_FILE_PATH)
   beforeEach(() => {
-    fileWatcher = new FileWatcher();
+    fileWatcher = new FileWatcher(config);
   });
 
   it("Czy jest zdefiniowana klasa FileWatcher", done => {
@@ -40,7 +42,7 @@ describe("FileWatcher", () => {
   });
 
   it("powinna zwrócić przeczytane dane", async done => {
-    new FileWatcher().readFile("./tmp/test3.csv").subscribe(
+    new FileWatcher(config).readFile("./tmp/test3.csv").subscribe(
       (res: string) => {
         expect(res).toEqual(EXAMPLE_DATA);
         done();
@@ -50,7 +52,7 @@ describe("FileWatcher", () => {
   });
 
   it("w przypadku błędu odczytu pliku funkcja readFile powinna zwrócić observable.error", async done => {
-    new FileWatcher().readFile("test.error.csv").subscribe(
+    new FileWatcher(config).readFile("test.error.csv").subscribe(
       (res: string) => expect(false).toBeTruthy(),
       (err: any) => {
         expect(err.name).toEqual("Error");
@@ -61,7 +63,7 @@ describe("FileWatcher", () => {
   });
 
   it("funkcja readFileAndSendThemToStream powinna odczytać plik i przekazać dane do podanego strumienia", done => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let stream = new Subject<string>();
     let fileName = `${stringGenerator()}.csv`;
     fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
@@ -75,7 +77,7 @@ describe("FileWatcher", () => {
   });
 
   it("w przypadku błędu odczytu pliku funkcja readFileAndSendThemToStream powinna ponowić próbę 5 krotnie", done => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let stream = new Subject<string>();
     let counter = 0;
     spyOn(fw, "readFile").and.returnValue(
@@ -94,7 +96,7 @@ describe("FileWatcher", () => {
 
   it("w przypadku błędu odczytu readFileAndSendThemToStream powinien zalogować błąd odczytu", done => {
     let fileName = `${stringGenerator()}.csv`;
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let stream = new Subject<string>();
 
     spyOn(fw.logger, "error").and.callFake(function(obj: any) {
@@ -113,7 +115,7 @@ describe("FileWatcher", () => {
   });
 
   it("utworzony plik powinien zostać usunięty", () => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let fileName = `${stringGenerator()}.csv`;
     fs.writeFileSync(`./tmp/${fileName}`, EXAMPLE_DATA, { encoding: "utf8" });
     expect(fs.existsSync(`./tmp/${fileName}`)).toBeTruthy();
@@ -124,7 +126,7 @@ describe("FileWatcher", () => {
   it("watchFile powinien zwrócić Subject w którym powinna przyjść informacja o pojawieniu się pliku", done => {
     let fileName = `${stringGenerator()}.csv`;
 
-    new FileWatcher().watchFile(`tmp`).subscribe((path: string) => {
+    new FileWatcher(config).watchFile(`tmp`).subscribe((path: string) => {
       if (path.toLowerCase() === `tmp/${fileName}`.toLowerCase()) {
         fs.unlinkSync(`tmp/${fileName}`);
         done();
@@ -138,7 +140,7 @@ describe("FileWatcher", () => {
     fs.writeFileSync(`tmp/${fileName}`, "", { encoding: "utf8" });
     let counter = 0;
 
-    new FileWatcher().watchFile(`tmp`).subscribe((path: string) => {
+    new FileWatcher(config).watchFile(`tmp`).subscribe((path: string) => {
       if (counter >= 1) {
         if (path.toLowerCase() === `tmp/${fileName}`.toLowerCase()) {
           fs.unlinkSync(`tmp/${fileName}`);
@@ -153,13 +155,13 @@ describe("FileWatcher", () => {
   });
 
   it("startWatch powinien zwracać strumień", () => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let fileName = `${stringGenerator()}.csv`;
     expect(fw.startWatch("tmp", fileName, false)).toBeDefined();
   });
   it("startWatch w przypadku napotkania błędu powinien zwrócić Observable.error i przerwać obserowanie plików", done => {
     let fileName = `${stringGenerator()}.csv`;
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     spyOn(fw, "readFileAndSendThemToStream").and.callFake(function() {
       throw new Error("Błąd odczytu");
     });
@@ -179,7 +181,7 @@ describe("FileWatcher", () => {
   });
 
   it("w strumieniu powinny pojawić się dane wgrane do obserwowanego pliku podczas uruchamiania obserwowania", done => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let fileName = `${stringGenerator()}.csv`;
     if (fs.existsSync(`./tmp/${fileName}`)) {
       fs.unlinkSync(`./tmp/${fileName}`);
@@ -192,7 +194,7 @@ describe("FileWatcher", () => {
   });
 
   it("powinien usunąć plik z danymi po przeczytaniu ich", done => {
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let fileName = `${stringGenerator()}.csv`;
 
     if (fs.existsSync(`./tmp/${fileName}`)) {
@@ -208,7 +210,7 @@ describe("FileWatcher", () => {
 
   it("po zmianie danych w pliku powinny pojawić się one w strumieniu", done => {
     let fileName = `${stringGenerator()}.csv`;
-    let fw = new FileWatcher();
+    let fw = new FileWatcher(config);
     let counter = 0;
 
     fw.startWatch(`tmp`, fileName, true).subscribe((data: string) => {
