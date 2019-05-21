@@ -49,7 +49,7 @@ export class Index {
     errors.pipe(
       concatMap((e, i) =>
         iif(
-          () => i > this.config.attempsWhenError,
+          () => i >= this.config.attempsWhenError,
           throwError(e),
           of(e).pipe(
             tap(val => (this.readFileOnStart = false)),
