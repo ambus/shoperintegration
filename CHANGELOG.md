@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/ambus/shoperintegration/compare/v1.3.0...v1.4.0) (2019-05-21)
+
+
+### Features
+
+* **backup:** dodano parametr konfiguracyjny określający czy mają być wykonywane backup'y ([907f69c](https://github.com/ambus/shoperintegration/commit/907f69c))
+* **config:** dodano parametr określający czy mamy wysyłać maile ([336e806](https://github.com/ambus/shoperintegration/commit/336e806))
+* **fileWatcher:** file watcher pobiera konfigurację w konstruktorze ([4c14e5e](https://github.com/ambus/shoperintegration/commit/4c14e5e))
+* **index:** dodano zmienianie nieobsługiwanych znaków ([4252584](https://github.com/ambus/shoperintegration/commit/4252584))
+* **index:** poprawiono warunek sprawdzania ilości powtórzeń dla zadania ([abb6c89](https://github.com/ambus/shoperintegration/commit/abb6c89))
+* **index:** przy uruchamianiu nie są już dokonywane próby odczytu pliku ([92c8cc4](https://github.com/ambus/shoperintegration/commit/92c8cc4))
+* **replaceNotsupportedSight:** dodano funkcję podmieniającą niewspierane przez shopear znaki na kody ([6d9bddc](https://github.com/ambus/shoperintegration/commit/6d9bddc))
+
+
+### Tests
+
+* **email:** zmienną config w celach testowych zrobioną publiczną ([2a7f1cb](https://github.com/ambus/shoperintegration/commit/2a7f1cb))
+* **index:** usunięto niepotrzebny mockup danych ([3dad043](https://github.com/ambus/shoperintegration/commit/3dad043))
+* **index:** usunięto zdublowany test ([2dd9e92](https://github.com/ambus/shoperintegration/commit/2dd9e92))
+
+
+
 ## [1.3.0](https://github.com/ambus/shoperintegration/compare/v1.2.3...v1.3.0) (2019-05-20)
 
 
