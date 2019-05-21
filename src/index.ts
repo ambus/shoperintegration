@@ -82,4 +82,6 @@ export class Index {
   }
 }
 
-new Index(CONFIG_FILE_NAME).startWatchFile();
+var main = (function() {
+  new Index(CONFIG_FILE_NAME).startWatchFile();
+})();
