@@ -47,26 +47,6 @@ describe("Index", () => {
     done();
   });
 
-  it("w przypadku błędu odczytu pliku powinien pięciokrotnie ponowić próbę odczytu", done => {
-    let index2: Index;
-    index2 = new Index(TEST_CONFIG_FILE_PATH);
-    let fileName = `${stringGenerator()}.csv`;
-    index2.config.fileInfo.fileName = fileName;
-    index2.config.errorDelayTime = 50;
-    let index = 0;
-
-    spyOn(index2.fw, "readFile").and.callFake(function(obj: {}) {
-      return Observable.create((observer: AnonymousSubject<string>) => {
-        index++;
-        if (index >= index2.config.attempsWhenError) {
-          done();
-        }
-        observer.error(new Error("Napotkano błąd podczas próby odczytu pliku"));
-      });
-    });
-    index2.startWatchFile();
-  });
-
   it("retryWhen gdy napotka błędy powinien próbowac podjąć ponowną próbe subskrybcji określoną ilość razy z przerwą określoną w konfiguracji", done => {
     let index = 0;
     let index2: Index;
