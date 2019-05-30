@@ -7,7 +7,7 @@ export function replaceNotSupportedSight(): OperatorFunction<FilonMerchandise[],
     return source.pipe(
       map((filonMerchandises: FilonMerchandise[]) => {
         filonMerchandises.map((filonMerchandise: FilonMerchandise) => {
-          filonMerchandise.product_code = filonMerchandise.product_code.replace("#", "\u0023");
+          filonMerchandise.product_code = filonMerchandise.product_code.replace("#", "\\u0023");
           return filonMerchandise;
         });
         return filonMerchandises;
