@@ -5,7 +5,7 @@ import { ParserOptions } from "../models/parser-options";
 import { FileInfo } from "../models/file-info";
 import { ShoperConfig } from "../models/shoper-config";
 import { SMTPConfig } from "../models/smtp-config";
-import { emailNoticication } from "../models/email-notifications-list";
+import { EmailNoticication } from "../models/email-notifications-list";
 import { BackupConfig } from "../models/backup-config";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
@@ -22,7 +22,7 @@ export class Config {
   public attempsWhenError: number;
   public shoperConfig: ShoperConfig;
   public smtpConfig: SMTPConfig;
-  public emailNoticication: emailNoticication;
+  public emailNoticication: EmailNoticication;
   public backup: BackupConfig;
 
   private constructor(private fileLocation: string) {
