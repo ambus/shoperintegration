@@ -5,7 +5,7 @@ import { ParserOptions } from "../models/parser-options";
 import { FileInfo } from "../models/file-info";
 import { ShoperConfig } from "../models/shoper-config";
 import { SMTPConfig } from "../models/smtp-config";
-import { EmailNoticicationList } from "../models/email-notifications-list";
+import { emailNoticication } from "../models/email-notifications-list";
 import { BackupConfig } from "../models/backup-config";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
@@ -22,7 +22,7 @@ export class Config {
   public attempsWhenError: number;
   public shoperConfig: ShoperConfig;
   public smtpConfig: SMTPConfig;
-  public emailNoticicationList: EmailNoticicationList;
+  public emailNoticication: emailNoticication;
   public backup: BackupConfig;
 
   private constructor(private fileLocation: string) {
@@ -50,7 +50,7 @@ export class Config {
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
-      this.emailNoticicationList = config.emailNoticicationList;
+      this.emailNoticication = config.emailNoticication;
       this.backup = config.backup;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
@@ -64,7 +64,8 @@ export class Config {
       this.attempsWhenError = config.attempsWhenError;
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
-      this.emailNoticicationList = config.emailNoticicationList;
+      this.emailNoticication = config.emailNoticication;
+      
       this.backup = config.backup;
     }
   }
@@ -120,9 +121,10 @@ export class Config {
         },
         status: false
       },
-      emailNoticicationList: {
+      emailNoticication: {
         alerts: [],
-        adminsNotifications: []
+        adminsNotifications: [],
+        sendNotificationToErrorTypes: ["undefined", "update_errror"]
       },
       backup: {
         filelocation: "./",

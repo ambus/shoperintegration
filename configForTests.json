@@ -61,9 +61,14 @@
         },
         "status": false
     },
-    "emailNoticicationList": {
+    "emailNoticication": {
         "alerts": [],
-        "adminsNotifications": []
+        "adminsNotifications": [],
+        "sendNotificationToErrorTypes": [
+            "undefined",
+            "update_errror",
+            "token_get"
+        ]
     },
     "backup": {
         "filelocation": "./tmp/backup",
