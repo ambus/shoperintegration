@@ -26,5 +26,17 @@ function dev_uploadFileFTP(cb: any) {
   );
 }
 
+function dev_uploadConfigFTP(cb: any) {
+  return src("./config.json").pipe(
+    sftp({
+      host: DEV_SERVER_ADRES,
+      user: DEV_SERVER_PASS.user,
+      pass: DEV_SERVER_PASS.pass,
+      remotePath: DEV_REMOTE_PATH + "/"
+    })
+  );
+}
+
 exports.dev_buildAndUpload = series(release, cleanDistDirectory, build, dev_uploadFileFTP);
+exports.dev_uploadConfigFTP = series(dev_uploadConfigFTP);
 exports.release = series(release);
