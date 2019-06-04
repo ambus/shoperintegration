@@ -31,11 +31,11 @@ export class Index {
     });
     this.backup = new Backup(this.config);
     this.eMail = new EMail(this.config);
-    let message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticicationList.adminsNotifications}`;
+    let message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticication.adminsNotifications}`;
     let messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${
-      this.config.emailNoticicationList.adminsNotifications
+      this.config.emailNoticication.adminsNotifications
     }</p><b>Życzymy miłego dnia 😀</b>`;
-    this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, this.config.emailNoticicationList.alerts);
+    this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, this.config.emailNoticication.alerts);
   }
 
   init(configFileName: string): void {
