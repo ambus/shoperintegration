@@ -1,0 +1,76 @@
+{
+    "templateLines": [
+        {
+            "description": "subject",
+            "lineFields": [
+                {
+                    "name": "type",
+                    "type": "select",
+                    "textBefore": "",
+                    "textAfter": "",
+                    "question": "Commit type:",
+                    "description": "",
+                    "data": [
+                        "fix",
+                        "feat",
+                        "build",
+                        "ci",
+                        "docs",
+                        "perf",
+                        "refactor",
+                        "style",
+                        "test"
+                    ]
+                },
+                {
+                    "name": "scope",
+                    "type": "text",
+                    "textBefore": "(",
+                    "textAfter": "):",
+                    "question": "Scope:",
+                    "description": "Scope of affected module.",
+                    "data": []
+                },
+                {
+                    "name": "message",
+                    "type": "text",
+                    "textBefore": " ",
+                    "textAfter": "",
+                    "question": "Commit message:",
+                    "description": "Message of commit",
+                    "data": []
+                }
+            ]
+        },
+        {
+            "description": "body",
+            "startString": "\r\n\r\n",
+            "lineFields": [
+                {
+                    "name": "description",
+                    "type": "text",
+                    "textBefore": "",
+                    "textAfter": "",
+                    "question": "Description:",
+                    "description": "Just as in the subject, use the imperative, present tense: 'change' not 'changed' nor 'changes'.\nThe body should include the motivation for the change and contrast this with previous behavior.",
+                    "data": []
+                }
+            ]
+        },
+        {
+            "description": "footer",
+            "startString": "\r\n\r\n",
+            "lineFields": [
+                {
+                    "name": "description",
+                    "type": "text",
+                    "textBefore": "",
+                    "textAfter": "",
+                    "question": "Footer:",
+                    "description": "The footer should contain any information about Breaking Changes and is also the place to reference GitHub issues that this commit Closes. \nBreaking Changes should start with the word BREAKING CHANGE: with a space or two newlines. \nThe rest of the commit message is then used for this.",
+                    "data": []
+                }
+            ]
+        }
+    ]
+}
