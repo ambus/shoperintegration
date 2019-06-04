@@ -8,6 +8,7 @@ import { mockup_pushAjaxShoperUpdate } from "../test/mockup/shoper-update.mockup
 import { Index } from "./index";
 import { stringGenerator } from "./lib/string-generator";
 import { Task } from "./models/task";
+import { ErrorType } from "./models/error-type";
 const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 var index: Index;
@@ -80,5 +81,40 @@ describe("index - testy integracyjne", () => {
       }
     });
     fs.writeFileSync(`tmp/${fileName}`, filonStringMerchandise, { encoding: "utf8" });
+  });
+
+  it("jeśli towar przekazany do aktualizacji nie istnieje w shoperze to warunkowo ma zostać wysłany @ z powiadomieniem", done => {
+    let sendMail = jest.spyOn(index.shoperService.eMail, "sendMail").mockImplementation()
+    jest.spyOn(index.shoperService.shoperStockService, "_getAjaxStocks").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        let emtyResponse = {
+          originalEvent: null,
+          xhr: null,
+          request: null,
+          status: null,
+          response: {
+            count: "1",
+            pages: 1,
+            page: 1,
+            list: []
+          },
+          responseText: null,
+          responseType: null
+        };
+        observer.next(emtyResponse);
+        observer.complete();
+      })
+    );
+
+
+    index.startWatchFile();
+
+    let counter = 0;
+    index.shoperService.doneTask$.subscribe((task: Task) => {
+      expect(task.error.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER)
+      done();
+    });
+    fs.writeFileSync(`tmp/${fileName}`, `product_code;stock;price;priceE
+    BSZK0F1FLE051;   2;139,57;15,00`, { encoding: "utf8" });
   });
 });
