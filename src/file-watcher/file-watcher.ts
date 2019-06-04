@@ -57,7 +57,7 @@ export class FileWatcher {
             </p>
             <br />
             `;
-            this.eMail.sendMail(`🔥Nie można odczytać pliku ${filePath}`, message, messageHtml, this.config.emailNoticicationList.alerts);
+            this.eMail.sendMail(`🔥Nie można odczytać pliku ${filePath}`, message, messageHtml, this.config.emailNoticication.alerts);
           }
         }
       );
