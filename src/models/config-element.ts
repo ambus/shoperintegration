@@ -3,7 +3,7 @@ import { ParserOptions } from "./parser-options";
 import { FileInfo } from "./file-info";
 import { ShoperConfig } from "./shoper-config";
 import { SMTPConfig } from "./smtp-config";
-import { EmailNoticicationList } from "./email-notifications-list";
+import { EmailNoticication } from "./email-notifications-list";
 import { BackupConfig } from "./backup-config";
 
 export type ConfigElement = {
@@ -16,6 +16,6 @@ export type ConfigElement = {
   attempsWhenError: number;
   shoperConfig: ShoperConfig;
   smtpConfig: SMTPConfig;
-  emailNoticicationList: EmailNoticicationList;
+  emailNoticication: EmailNoticication;
   backup: BackupConfig;
 };
