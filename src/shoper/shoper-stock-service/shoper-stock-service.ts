@@ -65,7 +65,7 @@ export class ShoperStockService {
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {
-          this.logger.error(`Napotkano błąd podczas generowania obiektu do aktualizacji w shoperze`, err, taskToUpdate);
+          this.logger.error(`Napotkano błąd podczas pobierania obiektu do aktualizacji w shoperze`, err, taskToUpdate);
           return throwError(err);
         })
       );
