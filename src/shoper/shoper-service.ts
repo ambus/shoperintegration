@@ -190,8 +190,8 @@ export class ShoperService {
         <p style="color: red">Prosimy o ręczną aktualizację!</p>
         <p style="">Z programu Filon otrzymano dane: <pre>
         <code>${JSON.stringify(task.filonMerchandise, null, 4)}</code></pre></p>
-        <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task)}</code></pre></p>
-        <p>Treść błędu: ${task["error"]["message"] && task["error"]["message"] ? JSON.stringify(task["error"]["message"]) : JSON.stringify(task["error"])}</p>
+        <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task.shoperStock)}</code></pre></p>
+        <p>Treść błędu: ${task.error && task.error.message ? JSON.stringify(task.error.message) : JSON.stringify(task.error)}</p>
         <br />
         <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task)}</code></pre></p>
       `;
