@@ -3,11 +3,11 @@ import { Observable, of, OperatorFunction, throwError } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { catchError, map, retryWhen, switchMap, tap } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
-import { shoperUpdateStock } from "../../../test/mockup/shoper-update.mockup";
 import { Config } from "../../config/config";
-import { ErrorTask } from "../../models/error-task";
 import { Task } from "../../models/task";
 import { retryStrategy } from "../utils/retry-strategy";
+import { ErrorType } from "../../models/error-type";
+import { ErrorInTask } from "../../models/error-in-task";
 
 export class ShoperUpdateService {
   config: Config;
@@ -20,13 +20,14 @@ export class ShoperUpdateService {
 
   updateStock(userToken: string, task: Task): Observable<number> {
     return this._pushAjaxShoperUpdate(userToken, task).pipe(
-      map((res: AjaxResponse) => res.response as number),
       retryWhen(
         retryStrategy({
           maxRetryAttempts: this.config.shoperConfig.maxRetryAttempts,
           scalingDuration: this.config.shoperConfig.delayTimeInMilisec
         })
-      )
+      ),
+      catchError((err) => throwError(new ErrorInTask("Napotkano błąd podczas aktualizacji towaru w bazie shopera", err, ErrorType.UPDATE_ERROR))),
+      map((res: AjaxResponse) => res.response as number),
     );
   }
 
@@ -46,7 +47,7 @@ export class ShoperUpdateService {
         body: task.stockToUpdate || {}
       });
     } else {
-      return throwError("Nie można pobrać danych z shopera na temat nieznanego towaru");
+      return throwError(new ErrorInTask("Towaru nie ma w bazie danych shopera", task, ErrorType.ITEM_NOT_FOUND_IN_SHOPER));
     }
   }
 
@@ -71,7 +72,7 @@ export class ShoperUpdateService {
         }),
         catchError((err: any, caught: Observable<Task>) => {
           this.logger.error(`Napotkano błąd podczas aktualizacji towaru w bazie danych shopera: `, err, taskToUpdate);
-          return throwError(new ErrorTask(taskToUpdate || err, err));
+          return throwError(err);
         })
       );
     };

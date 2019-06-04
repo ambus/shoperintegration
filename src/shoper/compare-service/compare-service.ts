@@ -1,7 +1,6 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, OperatorFunction, throwError } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
-import { ErrorTask } from "../../models/error-task";
 import { Task } from "../../models/task";
 
 export class CompareService {
@@ -22,7 +21,7 @@ export class CompareService {
         }),
         catchError((err: any, caught: Observable<Task>) => {
           this.logger.error(`Napotkano błąd podczas generowania obiektu do aktualizacji w shoperze`, err, taskToUpdate);
-          return throwError(new ErrorTask(taskToUpdate || err, err));
+          return throwError(err);
         })
       );
     };

@@ -9,11 +9,11 @@ import { ShoperGetToken } from "./shoper-get-token";
 import { createTaskRequest } from "./utils/create-task-request";
 import { setEndTime } from "./utils/set-end-time";
 import { setStatus } from "./utils/set-status";
-import { ErrorTask } from "../models/error-task";
 import { EMail } from "../mail/email";
 import { ShoperStockService } from "./shoper-stock-service/shoper-stock-service";
 import { ShoperUpdateService } from "./shoper-update-service/shoper-update-service";
 import { CompareService } from "./compare-service/compare-service";
+import { ErrorType } from "../models/error-type";
 
 export class ShoperService {
   logger: Logger;
@@ -54,8 +54,9 @@ export class ShoperService {
         this.compareService.generateItemToUpdate(),
         this.shoperUpdateService.updateShoperStock(),
         catchError(err => {
-          err.status = TaskShoperRequestStatusValue.error;
-          return of(err);
+          task.status = TaskShoperRequestStatusValue.error;
+          task.error = err;
+          return of(task);
         }),
         finalize(() => this.logger.debug("Zakończono działanie sekwencji w switchMap - doingTask"))
       )
@@ -85,7 +86,7 @@ export class ShoperService {
         }),
         catchError(err => {
           this.logger.error(`Napotkano błąd podczas ustawiania tokena połączenia: `, err, taskToUpdate);
-          return throwError(new ErrorTask(taskToUpdate, err));
+          return throwError(err);
         })
       );
     };
@@ -98,8 +99,12 @@ export class ShoperService {
   doneTask$: Observable<Task> = this.doingTask$.pipe(
     mergeMap((task: Task) =>
       iif(
-        () => this.isErrorObject(task) && task.attemptCounter < this.config.shoperConfig.maxRetryAttempts,
-        of(task).pipe(tap((task: Task) => this.errorStream$.next(task))),
+        () => this.itShouldRetryTask(task) && task.error.errorType !== ErrorType.ITEM_NOT_FOUND_IN_SHOPER,
+        of(task).pipe(
+          tap((task: Task) => {
+            this.errorStream$.next(task);
+          })
+        ),
         of(task).pipe(
           mergeMap((task: Task) =>
             iif(
@@ -107,26 +112,13 @@ export class ShoperService {
               of(task).pipe(
                 tap((request: Task) => this.logger.error(`Nie udało się wykonać zadania o id ${request.id}.`)),
                 tap((task: Task) => {
-                  this.logger.error("Próba wysłania maila");
-                  let message = `Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${
-                    task.filonMerchandise.product_code
-                  }, napotkano błąd. Prawdopodobnie dane który miały zostać zakutalizowane nie zostały przesłane na serwer. Prosimy o ręczną aktualizację ponieważ dane które są w systemie shoper nie będą odpowiadały prawdzie. Z programu Filon otrzymano dane(kod, ilość, cena, cenaE): ${
-                    task.filonMerchandise.product_code
-                  } | ${task.filonMerchandise.stock} | ${task.filonMerchandise.price} | ${task.filonMerchandise.priceE}. Dane na temat towaru przekazane przez system shoper: ${JSON.stringify(
-                    task
-                  )}. Treść błędu: ${task["message"]}`;
-                  let messageHtml = `<h2>Błąd</h2>
-                  <h3>Podczas próby aktualizacji towaru o symbolu ${task.filonMerchandise.product_code}, napotkano błąd!</h3>
-                  <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
-                  <p style="color: red">Prosimy o ręczną aktualizację!</p>
-                  <p style="">Z programu Filon otrzymano dane: <pre>
-                  <code>${JSON.stringify(task.filonMerchandise, null, 4)}</code></pre></p>
-                  <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task)}</code></pre></p>
-                  <p>Treść błędu: ${JSON.stringify(task["message"])}</p>
-                  <br />
-                  <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task)}</code></pre></p>
-                  `;
-                  this.eMail.sendMail(`🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticicationList.alerts);
+                  if (
+                    task.error &&
+                    this.config.emailNoticication.sendNotificationToErrorTypes.length > 0 &&
+                    this.config.emailNoticication.sendNotificationToErrorTypes.find((type: string) => task.error.errorType === type)
+                  ) {
+                    this.sendEmailWithErrorMessage(task);
+                  }
                 })
               ),
               of(task).pipe(setStatus(TaskShoperRequestStatusValue.done))
@@ -135,10 +127,10 @@ export class ShoperService {
         )
       )
     ),
-    filter((task: Task) => !(this.isErrorObject(task) && task.attemptCounter < this.config.shoperConfig.maxRetryAttempts)),
+    filter((task: Task) => !this.itShouldRetryTask(task) || (task.error && task.error.errorType === ErrorType.ITEM_NOT_FOUND_IN_SHOPER)),
     this.endTask(),
     setEndTime(),
-    tap((request: Task) => this.logger.info(`Zakończono pracę przy zadaniu o id ${request.id}, czas zakończenia pracy ${new Date(request.endTime).toLocaleTimeString()}.`)),
+    tap((request: Task) => this.logger.debug(`Zakończono pracę przy zadaniu o id ${request.id}, czas zakończenia pracy ${new Date(request.endTime).toLocaleTimeString()}.`)),
     tap((request: Task) => this.connectionPoolIsFree$.next()),
     catchError(err => {
       this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
@@ -152,16 +144,16 @@ export class ShoperService {
       <br />
       <p>Treść błędu: ${JSON.stringify(err)}</p>
       `;
-      this.eMail.sendMail(`🔥🔥 Wstrzymano działanie strumienia!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
+      this.eMail.sendMail(`🔥🔥 Wstrzymano działanie strumienia!`, message, messageHtml, this.config.emailNoticication.adminsNotifications);
       return throwError(err);
     }),
     finalize(() => {
       this.logger.error("Strumień zakończył pracę");
       let message = `Serwer wstrzymał pracę - potrzebny jest restart`;
       let messageHtml = `<h2 style="color: red">Błąd krytyczny</h2>
-    <h3>Serwer wstrzymał pracę - potrzebny jest restart!</h3>
-    `;
-      this.eMail.sendMail(`🔥🔥🔥 Serwer wstrzymał pracę - potrzebny jest restart!`, message, messageHtml, this.config.emailNoticicationList.adminsNotifications);
+        <h3>Serwer wstrzymał pracę - potrzebny jest restart!</h3>
+      `;
+      this.eMail.sendMail(`🔥🔥🔥 Serwer wstrzymał pracę - potrzebny jest restart!`, message, messageHtml, this.config.emailNoticication.adminsNotifications);
     })
   );
 
@@ -169,11 +161,40 @@ export class ShoperService {
     return (source: Observable<Task>) =>
       source.pipe(
         delay(this.config.shoperConfig.delayTimeInMilisec),
-        tap((request: Task) => this.logger.info(`Wykonano zadanie o id ${request.id}`))
+        tap((request: Task) => this.logger.info(`Zakończono zadanie o id ${request.id}. Status: ${request.status}`))
       );
   }
 
-  isErrorObject(data: any): boolean {
-    return data.constructor.name === "ErrorTask" || (data.status && data.status === TaskShoperRequestStatusValue.error);
+  isNotEndingStreamError(data: any): boolean {
+    return data.status && data.status === TaskShoperRequestStatusValue.error && data.error.errorType !== ErrorType.ITEM_NOT_FOUND_IN_SHOPER;
+  }
+
+  itShouldRetryTask(task: any): boolean {
+    return !!(task.status && task.status === TaskShoperRequestStatusValue.error && task.attemptCounter < this.config.shoperConfig.maxRetryAttempts);
+  }
+
+  sendEmailWithErrorMessage(task: Task): void {
+    this.logger.debug("Próba wysłania maila");
+
+    let message = `Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${
+      task.filonMerchandise.product_code
+    }, napotkano błąd. Prawdopodobnie dane który miały zostać zakutalizowane nie zostały przesłane na serwer. Prosimy o ręczną aktualizację ponieważ dane które są w systemie shoper nie będą odpowiadały prawdzie. Z programu Filon otrzymano dane(kod, ilość, cena, cenaE): ${
+      task.filonMerchandise.product_code
+    } | ${task.filonMerchandise.stock} | ${task.filonMerchandise.price} | ${task.filonMerchandise.priceE}. Dane na temat towaru przekazane przez system shoper: ${JSON.stringify(task)}. Treść błędu: ${
+      task["message"]
+    }`;
+
+    let messageHtml = `<h2>Błąd</h2>
+        <h3>Podczas próby aktualizacji towaru o symbolu ${task.filonMerchandise.product_code}, napotkano błąd!</h3>
+        <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
+        <p style="color: red">Prosimy o ręczną aktualizację!</p>
+        <p style="">Z programu Filon otrzymano dane: <pre>
+        <code>${JSON.stringify(task.filonMerchandise, null, 4)}</code></pre></p>
+        <p>Dane na temat towaru przekazane przez system shoper: <pre><code>${JSON.stringify(task)}</code></pre></p>
+        <p>Treść błędu: ${task["error"]["message"] && task["error"]["message"] ? JSON.stringify(task["error"]["message"]) : JSON.stringify(task["error"])}</p>
+        <br />
+        <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task)}</code></pre></p>
+      `;
+    this.eMail.sendMail(`🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticication.alerts);
   }
 }

@@ -1,10 +1,12 @@
-import { Observable } from "rxjs";
+import { Observable, throwError } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { AnonymousSubject } from "rxjs/internal/Subject";
-import { map, retryWhen, tap } from "rxjs/operators";
+import { map, retryWhen, tap, catchError } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
 import { Config } from "../config/config";
 import { retryStrategy } from "./utils/retry-strategy";
+import { ErrorInTask } from "../models/error-in-task";
+import { ErrorType } from "../models/error-type";
 
 export class ShoperGetToken {
   static authorizationToken: string;
@@ -19,7 +21,10 @@ export class ShoperGetToken {
             maxRetryAttempts: maxRetryAttempts,
             scalingDuration: delayTimeInMilisec
           })
-        )
+        ),
+        catchError(err => {
+          return throwError(new ErrorInTask("Napotkano błąd podczas pobierania tokena uwierzytelniającego", err, ErrorType.TOKEN_GET));
+        })
       );
     } else {
       return Observable.create((observer: AnonymousSubject<string>) => {
