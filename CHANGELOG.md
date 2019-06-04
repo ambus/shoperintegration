@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/ambus/shoperintegration/compare/v1.4.1...v1.5.0) (2019-06-04)
+
+
+### Bug Fixes
+
+* **fileWatcher:** zmieniono nazwę parametry określającego listę adresatów powiadomień ([7e87ed4](https://github.com/ambus/shoperintegration/commit/7e87ed4))
+
+
+### Features
+
+* **config:** dodano parametr określający dla jakich typów błędów ma być wysyłane powiadomienie ([a76c0b9](https://github.com/ambus/shoperintegration/commit/a76c0b9))
+* **error:** błędy mają nowy schemat - są dodatkowym parametrem tasku ([a60342b](https://github.com/ambus/shoperintegration/commit/a60342b))
+* **error:** dodano informację o typie błędu i wiadomości jeśli błąd występuje ([99d6b47](https://github.com/ambus/shoperintegration/commit/99d6b47))
+* **error:** dodano nowy parametr w błędach - errorType ([33f6b99](https://github.com/ambus/shoperintegration/commit/33f6b99))
+
+
+### Tests
+
+* dostosowano testy do nowego schematu zwracania błędów ([d335e14](https://github.com/ambus/shoperintegration/commit/d335e14))
+* dostosowano testy do nowego schematu zwracania błędów ([d920ef1](https://github.com/ambus/shoperintegration/commit/d920ef1))
+
+
+
 ### [1.4.1](https://github.com/ambus/shoperintegration/compare/v1.4.0...v1.4.1) (2019-05-30)
 
 
