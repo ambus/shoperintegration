@@ -12,6 +12,8 @@ import { shoperStockMockup, mockup_getAjaxStock } from "../../test/mockup/shoper
 import { mockup_shoperGetToken } from "../../test/mockup/shoper-get-token.mockup";
 import { mockup_pushAjaxShoperUpdate } from "../../test/mockup/shoper-update.mockup";
 import { ShoperGetToken } from "./shoper-get-token";
+import { ErrorType } from "../models/error-type";
+import { ErrorInTask } from "../models/error-in-task";
 
 describe("shoperService", () => {
   let shoperService: ShoperService;
@@ -121,7 +123,7 @@ describe("shoperService - błędy połączenia", () => {
     jest.spyOn(shoperServiceInside, "getToken").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
         counter++;
-        observer.error(errorString);
+        observer.error(new ErrorInTask("Napotkano błąd podczas pobierania tokena połączenia", {}, ErrorType.TOKEN_GET));
       })
     );
 
@@ -147,7 +149,7 @@ describe("shoperService - błędy połączenia", () => {
 
     let getShoperStock = jest.spyOn(shoperService.shoperStockService, "getStock").mockReturnValue(
       Observable.create((observer: AnonymousSubject<ShoperStock>) => {
-        observer.error("Błąd pobierania danych na temat towaru z systemu shoper");
+        observer.error(new ErrorInTask("Towaru nie ma w bazie danych shopera", {}, ErrorType.UNDEFINED));
       })
     );
 

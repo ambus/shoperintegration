@@ -62,7 +62,7 @@ describe("shoperGetToken - błędy połączenia", () => {
       (val: string) => {},
       err => {
         expect(counter).toBe(3);
-        expect(err).toBe("Błąd przy pobieraniu tokena");
+        expect(err.message).toBe("Napotkano błąd podczas pobierania tokena uwierzytelniającego");
         done();
       }
     );

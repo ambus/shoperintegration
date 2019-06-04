@@ -6,6 +6,7 @@ import { of, Observable } from "rxjs";
 import { AjaxResponse } from "rxjs/ajax";
 import { shoperStockMockup, mockup_getAjaxStock } from "../../../test/mockup/shoper-stock.mockup";
 import { AnonymousSubject } from "rxjs/internal/Subject";
+import { ErrorType } from "../../models/error-type";
 
 describe("shoperStockService", () => {
   let shoperStockService: ShoperStockService;
@@ -93,6 +94,41 @@ describe("shoperStockService - błędy połączenia", () => {
       },
       err => {
         expect(false).toBeTruthy();
+      }
+    );
+  });
+
+  it("Jeśli shoper zwróci informację ale bez danych towaru to zwrócić błąd z opisem że towaru nie ma w bazie shopera", done => {
+    let shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
+
+    jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        let emtyResponse = {
+          originalEvent: null,
+          xhr: null,
+          request: null,
+          status: null,
+          response: {
+            count: "1",
+            pages: 1,
+            page: 1,
+            list: []
+          },
+          responseText: null,
+          responseType: null
+        };
+        observer.next(emtyResponse);
+        observer.complete();
+      })
+    );
+
+    shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
+      (val: ShoperStock ) => {
+      },
+      err => {
+        expect(err.constructor.name).toBe("ErrorInTask")
+        expect(err.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER);
+        done();
       }
     );
   });

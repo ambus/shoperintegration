@@ -8,7 +8,8 @@ import { TaskShoperRequestStatusValue } from "../../models/task-shoper-request-s
 import { shoperStockMockup } from "../../../test/mockup/shoper-stock.mockup";
 import { taskMockup } from "../../../test/mockup/task.mockup";
 import { AnonymousSubject } from "rxjs/internal/Subject";
-import { Observable, of } from "rxjs";
+import { Observable, of, throwError } from "rxjs";
+import { map } from "rxjs/operators";
 
 describe("shoperUpdateService", () => {
   let shoperUpdateService: ShoperUpdateService;
@@ -51,6 +52,8 @@ describe("shoperUpdateService", () => {
 
 describe("shoperUpdateService - błędy połączenia", () => {
   it("jeśli funkcja napotka błąd podczas próby dokonania aktualizacji to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd jeśli błędy się powtarzają", done => {
+    let config = Config.getInstance();
+    config.shoperConfig.delayTimeInMilisec = 50;
     let shoperUpdateService: ShoperUpdateService = new ShoperUpdateService(Config.getInstance());
 
     let errorObject = {
@@ -72,7 +75,7 @@ describe("shoperUpdateService - błędy połączenia", () => {
         err => {
           expect(err).toBeDefined();
           expect(counter).toBe(3);
-          expect(err.message).toBe(errorObject);
+          expect(err.error).toBe(errorObject);
           done();
         }
       );
@@ -96,7 +99,7 @@ describe("shoperUpdateService - błędy połączenia", () => {
       (observer: number) => {},
       err => {
         expect(counter).toBe(3);
-        expect(err).toBe(errorObject);
+        expect(err.error).toBe(errorObject);
         done();
       }
     );
