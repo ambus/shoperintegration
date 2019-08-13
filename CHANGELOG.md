@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4](https://github.com/ambus/shoperintegration/compare/v1.5.3...v1.5.4) (2019-08-13)
+
+
+### Bug Fixes
+
+* **csvParser:** product code is always string type ([b0dc37f](https://github.com/ambus/shoperintegration/commit/b0dc37f))
+
+
+
 ### [1.5.3](https://github.com/ambus/shoperintegration/compare/v1.5.2...v1.5.3) (2019-08-13)
 
 
