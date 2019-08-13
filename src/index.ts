@@ -73,6 +73,7 @@ export class Index {
       )
       .subscribe(
         (filonMerchandises: FilonMerchandise[]) => {
+        this.logger.debug(`Sparsowane dane ${filonMerchandises}. Dane zostaną przekazane do nowego taska`);
           filonMerchandises.forEach((filonItems: FilonMerchandise) => {
             this.shoperService.addTask(filonItems);
           });

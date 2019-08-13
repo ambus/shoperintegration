@@ -34,6 +34,7 @@ export class ShoperService {
   }
 
   addTask(filonMerchandise: FilonMerchandise): void {
+    this.logger.debug(`Nowe zadanie dla produktu o kodzie: ${filonMerchandise.product_code}`);
     this.filonMerchandiseAdd$.next(filonMerchandise);
   }
 
