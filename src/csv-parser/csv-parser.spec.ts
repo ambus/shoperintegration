@@ -24,6 +24,14 @@ BSZK0IZMWAS02;   1;16,00
 SBARDC22;   6;824,10
 `;
 
+const NUMBER_CODE_DATA = `
+product_code;stock;price;priceE
+BSZK0F1FLE051;   2;139,57;139,57
+5903755049179;   2;122,00;122,00
+BSZK0IZMWAS02;   1;16,00;139,57
+SBARDC22;   6;824,10;139,57
+`;
+
 const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 var config: Config;
@@ -78,4 +86,12 @@ describe("CSVParser", () => {
         done();
       });
   });
+
+  it("Jeśli towar posiada kod składający się wyłącznie z liczb to powinien zostać on sparsowany na tekst", () => {
+    let merchandises = parseCSVDataToFilonMerchandise(NUMBER_CODE_DATA, config.parserOptions);
+    expect(merchandises.length).toBe(4)
+    merchandises.forEach((merchandise: FilonMerchandise) => {
+      expect(typeof merchandise.product_code === "string").toBeTruthy()
+    });
+  })
 });

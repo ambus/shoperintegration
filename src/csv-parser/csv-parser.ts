@@ -21,6 +21,7 @@ export function parseCSVDataToFilonMerchandise(dataToParse: string, config: Pars
     logger.error("Podczas parsowania danych napotkano błąd", err);
     return [];
   }
+  parsedMerchandiseArray = changeCodeFromNumberToString(parsedMerchandiseArray);
   logger.debug(`Parsowanie zakończyło się powodzeniem. Odczytano ${parsedMerchandiseArray.length} towarów. Dane po parsowaniu:`, parsedMerchandiseArray);
   return parsedMerchandiseArray;
 }
@@ -41,7 +42,7 @@ export function parseCSVDataStream(parseOptions: ParserOptions): OperatorFunctio
   return (source: Observable<string>) => {
     return source.pipe(
       map((filonMerchandisesString: string) => {
-        return parseCSVDataToFilonMerchandise(filonMerchandisesString, parseOptions)
+        return parseCSVDataToFilonMerchandise(filonMerchandisesString, parseOptions);
       }),
       catchError((err: any, caught: Observable<FilonMerchandise[]>) => {
         this.logger.error(`Napotkano błąd podczas zmieniania przecinków na kropki w danych z filona`, err);
@@ -52,3 +53,10 @@ export function parseCSVDataStream(parseOptions: ParserOptions): OperatorFunctio
   };
 }
 
+function changeCodeFromNumberToString(merchandiseArray: FilonMerchandise[]): FilonMerchandise[] {
+  let merchandises = [...merchandiseArray];
+  for (let merchandise of merchandises) {
+    merchandise.product_code = merchandise.product_code.toString();
+  }
+  return merchandises;
+}
