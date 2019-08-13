@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.3](https://github.com/ambus/shoperintegration/compare/v1.5.2...v1.5.3) (2019-08-13)
+
+
+### Bug Fixes
+
+* **config:** poprawiono nazwę typu EmailNotyfication ([f6cfb92](https://github.com/ambus/shoperintegration/commit/f6cfb92))
+* **log:** add log to spy stream ([8e681b7](https://github.com/ambus/shoperintegration/commit/8e681b7))
+
+
+### Build System
+
+* **gulp:** dodano task aktualizujący na serwerze ftp konfigurację ([10ce973](https://github.com/ambus/shoperintegration/commit/10ce973))
+
+
+
 ### [1.5.2](https://github.com/ambus/shoperintegration/compare/v1.5.1...v1.5.2) (2019-06-04)
 
 
