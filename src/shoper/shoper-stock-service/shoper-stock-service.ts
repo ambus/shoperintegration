@@ -29,8 +29,12 @@ export class ShoperStockService {
       ),
       mergeMap((res: AjaxResponse) =>
         iif(
-          () => res.response.list && res.response.list.length === 0,
-          throwError(new ErrorInTask("Towaru nie ma w bazie danych shopera", res, ErrorType.ITEM_NOT_FOUND_IN_SHOPER)),
+          () => res.status !== 200 || (res.response.list && res.response.list.length === 0),
+          throwError(
+            res.status === 401
+              ? new ErrorInTask("Brak autoryzacji!", res, ErrorType.UNAUTHORIZED_CLIENT)
+              : new ErrorInTask("Towaru nie ma w bazie danych shopera", res, ErrorType.ITEM_NOT_FOUND_IN_SHOPER)
+          ),
           of(res).pipe(map((res: AjaxResponse) => res.response.list[0] as ShoperStock))
         )
       )

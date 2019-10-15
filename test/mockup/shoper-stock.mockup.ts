@@ -7,7 +7,7 @@ export let shoperStockMockup: AjaxResponse = {
   originalEvent: null,
   xhr: null,
   request: null,
-  status: null,
+  status: 200,
   response: {
     count: "1",
     pages: 1,
@@ -57,7 +57,7 @@ export let shoperStockWithExtendedMockup: AjaxResponse = {
   originalEvent: null,
   xhr: null,
   request: null,
-  status: null,
+  status: 200,
   response: {
     count: "1",
     pages: 1,
@@ -104,6 +104,56 @@ export let shoperStockWithExtendedMockup: AjaxResponse = {
   },
   responseText: null,
   responseType: null
+};
+
+export const shoperAuthenticationErrorResponse = {
+  message: "ajax error 401",
+  name: "AjaxError",
+  xhr: {
+    UNSENT: 0,
+    OPENED: 1,
+    HEADERS_RECEIVED: 2,
+    LOADING: 3,
+    DONE: 4,
+    readyState: 4,
+    onreadystatechange: {},
+    responseText: '{"error":"unauthorized_client","error_description":"Provided access token is invalid"}',
+    responseXML: "",
+    status: 401,
+    statusText: null,
+    withCredentials: false,
+    open: [Function],
+    setDisableHeaderCheck: [Function],
+    setRequestHeader: [Function],
+    getResponseHeader: [Function],
+    getAllResponseHeaders: [Function],
+    getRequestHeader: [Function],
+    send: [Function],
+    handleError: [Function],
+    abort: [Function],
+    addEventListener: [Function],
+    removeEventListener: [Function],
+    dispatchEvent: [Function],
+    ontimeout: {},
+    onload: {},
+    timeout: 0,
+    responseType: "json"
+  },
+  request: {
+    async: true,
+    createXHR: [],
+    crossDomain: true,
+    withCredentials: false,
+    headers: { Authorization: "Bearer someBearerCode" },
+    method: "GET",
+    responseType: "json",
+    timeout: 0,
+    url: 'urlAddress',
+    body: undefined
+  },
+  status: 401,
+  responseType: "json",
+  response: { error: "unauthorized_client", error_description: "Provided access token is invalid" }
 };
 
 export let mockup_getAjaxStock = function(shoperStockService: ShoperStockService) {

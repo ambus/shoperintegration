@@ -24,12 +24,14 @@ export class ShoperService {
   shoperStockService: ShoperStockService;
   shoperUpdateService: ShoperUpdateService;
   compareService: CompareService;
+  config: Config
 
-  constructor(public config: Config) {
+  constructor(public configuration: Config) {
+    this.config = configuration;
     this.logger = getLogger("ShoperService");
-    this.eMail = new EMail(config);
-    this.shoperStockService = new ShoperStockService(config);
-    this.shoperUpdateService = new ShoperUpdateService(config);
+    this.eMail = new EMail(this.config);
+    this.shoperStockService = new ShoperStockService(this.config);
+    this.shoperUpdateService = new ShoperUpdateService(this.config);
     this.compareService = new CompareService();
   }
 
@@ -58,21 +60,21 @@ export class ShoperService {
           task.status = TaskShoperRequestStatusValue.error;
           task.error = err;
           return of(task);
+
         }),
         finalize(() => this.logger.debug("Zakończono działanie sekwencji w switchMap - doingTask"))
       )
     ),
-    finalize(() => this.logger.warn("Zakończono działanie całej sekcji doingTask"))
+    finalize(() => this.logger.debug("Zakończono działanie całej sekcji doingTask"))
   );
 
   setConnectionToken(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) => {
       let taskToUpdate: Task;
-      let refreshToken = taskToUpdate && taskToUpdate.status === TaskShoperRequestStatusValue.error ? true : false;
       return source.pipe(
         tap((task: Task) => (taskToUpdate = task)),
         switchMap(
-          (task: Task) => this.getToken(refreshToken),
+          (task: Task) => this.getToken(task && (task.status === TaskShoperRequestStatusValue.error ? true : false)),
           (outerValue, innerValue, outerIndex, innerIndex) => ({
             outerValue,
             innerValue,
@@ -94,7 +96,7 @@ export class ShoperService {
   }
 
   getToken(refresh: boolean = false): Observable<string> {
-    return ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, refresh, Config.getInstance().shoperConfig.delayTimeInMilisec, Config.getInstance().shoperConfig.maxRetryAttempts);
+    return ShoperGetToken.getToken(this.config.shoperConfig.userToken, refresh, this.config.shoperConfig.delayTimeInMilisec, this.config.shoperConfig.maxRetryAttempts);
   }
 
   doneTask$: Observable<Task> = this.doingTask$.pipe(
@@ -161,7 +163,7 @@ export class ShoperService {
   endTask(): OperatorFunction<Task, Task> {
     return (source: Observable<Task>) =>
       source.pipe(
-        delay(this.config.shoperConfig.delayTimeInMilisec),
+        delay(Config.getInstance().shoperConfig.delayTimeInMilisec),
         tap((request: Task) => this.logger.info(`Zakończono zadanie o id ${request.id}. Status: ${request.status}`))
       );
   }

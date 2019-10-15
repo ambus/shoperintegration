@@ -30,11 +30,10 @@ export class Config {
   }
 
   static getInstance(fileLocation: string = DEFAULT_CONFIG_FILE_PATH) {
-    if (!Config.instance || fileLocation !== this.filePath) {
+    if (!Config.instance || (fileLocation !== this.filePath && fileLocation !== DEFAULT_CONFIG_FILE_PATH)) {
       Config.instance = new Config(fileLocation);
+      this.filePath = fileLocation;
     }
-    this.filePath = fileLocation;
-
     return Config.instance;
   }
 
@@ -65,7 +64,7 @@ export class Config {
       this.shoperConfig = config.shoperConfig;
       this.smtpConfig = config.smtpConfig;
       this.emailNoticication = config.emailNoticication;
-      
+
       this.backup = config.backup;
     }
   }

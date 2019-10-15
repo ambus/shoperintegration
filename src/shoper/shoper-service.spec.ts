@@ -1,4 +1,4 @@
-import { throwError, of, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { bufferCount } from "rxjs/operators";
 import { Config } from "../config/config";
 import { stringGenerator } from "../lib/string-generator";
@@ -8,12 +8,13 @@ import { TaskShoperRequestStatusValue } from "../models/task-shoper-request-stat
 import { ShoperService } from "./shoper-service";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { ShoperStock } from "../models/shoper-stock";
-import { shoperStockMockup, mockup_getAjaxStock } from "../../test/mockup/shoper-stock.mockup";
+import { shoperStockMockup, mockup_getAjaxStock, shoperAuthenticationErrorResponse } from "../../test/mockup/shoper-stock.mockup";
 import { mockup_shoperGetToken } from "../../test/mockup/shoper-get-token.mockup";
 import { mockup_pushAjaxShoperUpdate } from "../../test/mockup/shoper-update.mockup";
-import { ShoperGetToken } from "./shoper-get-token";
 import { ErrorType } from "../models/error-type";
 import { ErrorInTask } from "../models/error-in-task";
+
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 describe("shoperService", () => {
   let shoperService: ShoperService;
@@ -161,6 +162,37 @@ describe("shoperService - błędy połączenia", () => {
       expect(sendMail).toBeCalled();
       done();
     });
+    let product_code = stringGenerator();
+
+    let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00" };
+    shoperService.addTask(filonMerchandise);
+  });
+
+  it("jeśli połączenie zwróci błąd 401 system powinien ponowić próbę uzyskania tokena autoryzacyjnego", done => {
+    mockup_shoperGetToken();
+    let shoperService = new ShoperService(Config.getInstance(TEST_CONFIG_FILE_PATH));
+    shoperService.shoperStockService;
+    let counter = 0;
+    jest.spyOn(shoperService, "getToken").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        counter++;
+        observer.error(new ErrorInTask("Napotkano błąd podczas pobierania tokena połączenia", {}, ErrorType.TOKEN_GET));
+      })
+    );
+
+    jest.spyOn(shoperService.shoperStockService, "_getAjaxStocks").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        observer.next(shoperAuthenticationErrorResponse);
+        observer.complete();
+      })
+    );
+
+    shoperService.doneTask$.subscribe((val: Task) => {
+      if (counter >= Config.getInstance().shoperConfig.maxRetryAttempts) {
+        done();
+      }
+    });
+
     let product_code = stringGenerator();
 
     let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00" };
