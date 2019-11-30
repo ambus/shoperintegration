@@ -139,4 +139,23 @@ describe("shoperUpdateService - błędy połączenia", () => {
         }
       );
   });
+
+  it("eśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", done => {
+    let config: Config = Config.getInstance();
+    const errorDelayTIme = 500;
+    config.errorDelayTime = errorDelayTIme;
+    let shoperUpdateService: ShoperUpdateService = new ShoperUpdateService(config);
+
+    jest.spyOn(shoperUpdateService, "_pushAjaxShoperUpdate").mockReturnValue(Observable.create((observer: AnonymousSubject<any>) => {}));
+    const startTime = Date.now();
+
+    shoperUpdateService.updateStock(stringGenerator(), taskMockup).subscribe(
+      (observer: number) => {},
+      err => {
+        expect(startTime + errorDelayTIme).toBeLessThan(Date.now());
+        expect(err.error.name).toBe("TimeoutError");
+        done();
+      }
+    );
+  });
 });
