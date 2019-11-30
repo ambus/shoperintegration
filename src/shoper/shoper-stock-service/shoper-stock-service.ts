@@ -1,7 +1,7 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, OperatorFunction, throwError, iif, of } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
-import { catchError, map, retryWhen, switchMap, tap, mergeMap } from "rxjs/operators";
+import { catchError, map, retryWhen, switchMap, tap, mergeMap, timeout } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
 import { Config } from "../../config/config";
 import { ShoperStock } from "../../models/shoper-stock";
@@ -27,6 +27,7 @@ export class ShoperStockService {
           scalingDuration: this.config.shoperConfig.delayTimeInMilisec
         })
       ),
+      timeout(this.config.errorDelayTime),
       mergeMap((res: AjaxResponse) =>
         iif(
           () => res.status !== 200 || (res.response.list && res.response.list.length === 0),

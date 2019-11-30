@@ -7,6 +7,7 @@ import { AjaxResponse } from "rxjs/ajax";
 import { shoperStockMockup, mockup_getAjaxStock } from "../../../test/mockup/shoper-stock.mockup";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { ErrorType } from "../../models/error-type";
+import { config } from "aws-sdk";
 
 describe("shoperStockService", () => {
   let shoperStockService: ShoperStockService;
@@ -128,6 +129,26 @@ describe("shoperStockService - błędy połączenia", () => {
       err => {
         expect(err.constructor.name).toBe("ErrorInTask")
         expect(err.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER);
+        done();
+      }
+    );
+  });
+
+  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu 3 sekund powinniśmy zwracać błąd", done => {
+    let config: Config = Config.getInstance();
+    config.errorDelayTime = 500;
+    let shoperStockService: ShoperStockService = new ShoperStockService(config);
+
+    jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+      })
+    );
+
+    shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
+      (val: ShoperStock ) => {
+      },
+      err => {
+        expect(err.name).toBe("TimeoutError")
         done();
       }
     );
