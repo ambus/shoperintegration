@@ -39,6 +39,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "path": "^0.12.7",
     "rxjs": "^6.4.0",
+    "sqlite3": "^4.1.0",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {

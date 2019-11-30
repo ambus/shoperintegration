@@ -7,7 +7,6 @@ import { AjaxResponse } from "rxjs/ajax";
 import { shoperStockMockup, mockup_getAjaxStock } from "../../../test/mockup/shoper-stock.mockup";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { ErrorType } from "../../models/error-type";
-import { config } from "aws-sdk";
 
 describe("shoperStockService", () => {
   let shoperStockService: ShoperStockService;
