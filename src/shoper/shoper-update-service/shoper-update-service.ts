@@ -1,7 +1,7 @@
 import { getLogger, Logger } from "log4js";
 import { Observable, of, OperatorFunction, throwError } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
-import { catchError, map, retryWhen, switchMap, tap } from "rxjs/operators";
+import { catchError, map, retryWhen, switchMap, tap, timeout } from "rxjs/operators";
 import { XMLHttpRequest } from "xmlhttprequest";
 import { Config } from "../../config/config";
 import { Task } from "../../models/task";
@@ -26,6 +26,7 @@ export class ShoperUpdateService {
           scalingDuration: this.config.shoperConfig.delayTimeInMilisec
         })
       ),
+      timeout(this.config.errorDelayTime),
       catchError((err) => throwError(new ErrorInTask("Napotkano błąd podczas aktualizacji towaru w bazie shopera", err, ErrorType.UPDATE_ERROR))),
       map((res: AjaxResponse) => res.response as number),
     );

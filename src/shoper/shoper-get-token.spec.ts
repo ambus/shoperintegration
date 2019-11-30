@@ -67,4 +67,24 @@ describe("shoperGetToken - błędy połączenia", () => {
       }
     );
   });
+
+  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", done => {
+    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+      })
+    );
+    const startTime = Date.now();
+
+    const delayTimeInMilisec = 200;
+    const maxRetryAttempts = 3;
+
+    ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, delayTimeInMilisec, maxRetryAttempts).subscribe(
+      (val: string) => {},
+      err => {
+        expect(startTime + delayTimeInMilisec + delayTimeInMilisec * maxRetryAttempts).toBeLessThan(Date.now());
+        expect(err.error.name).toBe("TimeoutError")
+        done();
+      }
+    );
+  });
 });
