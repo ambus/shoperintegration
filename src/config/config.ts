@@ -133,7 +133,8 @@ export class Config {
         status: false
       },
       databaseConfig: {
-        fileName: "database.db"
+        fileName: "database.db",
+        memory: false,
       }
     };
   }

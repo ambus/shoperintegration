@@ -73,5 +73,9 @@
     "backup": {
         "filelocation": "./tmp/backup",
         "status": false
+    },
+    "databaseConfig": {
+        "fileName": "database.db",
+        "memory": false
     }
 }
