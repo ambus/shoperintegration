@@ -3,6 +3,9 @@ Service to integration shoper online shop with local data.
 
 Shoperintergration must communicate with the old DOS app. Communication will be done through changes on txt files.
 
+## Package Instalation
+Because `better-sqlite3` library needs node-gep to end installation, to install all node packages use command: `npm_config_build_from_source=true yarn install` (in npm everything works great).
+
 ### TODO
 * [X] add logger to file
 * [X] add file watcher service to locate change in input file
