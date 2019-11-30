@@ -134,20 +134,23 @@ describe("shoperStockService - błędy połączenia", () => {
     );
   });
 
-  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu 3 sekund powinniśmy zwracać błąd", done => {
+  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", done => {
     let config: Config = Config.getInstance();
-    config.errorDelayTime = 500;
+    const errorDelayTIme = 500;
+    config.errorDelayTime = errorDelayTIme;
     let shoperStockService: ShoperStockService = new ShoperStockService(config);
 
     jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
       })
     );
+    const startTime = Date.now();
 
     shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
       (val: ShoperStock ) => {
       },
       err => {
+        expect(startTime + errorDelayTIme).toBeLessThan(Date.now());
         expect(err.name).toBe("TimeoutError")
         done();
       }
