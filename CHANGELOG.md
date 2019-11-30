@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.6](https://github.com/ambus/shoperintegration/compare/v1.5.5...v1.5.6) (2019-11-30)
+
+
+### Bug Fixes
+
+* **shoperGetToken:** jeśli połączenie trwa za długo zostaje przerwane ([f39248c](https://github.com/ambus/shoperintegration/commit/f39248c))
+* **shoperStock:** ustawiono maksymalny czas oczekiwania na odpowiedź serwera ([ec5965d](https://github.com/ambus/shoperintegration/commit/ec5965d))
+* **shoperUpdateService:** jeśli oczekiwanie na odpowiedź serwera trwa zbyt długo połączenie jest przerywane ([4fdb2c5](https://github.com/ambus/shoperintegration/commit/4fdb2c5))
+
+
+### Tests
+
+* **shoperStockService:** fix test ([fc953b0](https://github.com/ambus/shoperintegration/commit/fc953b0))
+
+
+
 ### [1.5.5](https://github.com/ambus/shoperintegration/compare/v1.5.4...v1.5.5) (2019-10-15)
 
 
