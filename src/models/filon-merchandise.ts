@@ -3,4 +3,5 @@ export type FilonMerchandise = {
   stock: number;
   price: string;
   priceE?: string;
+  warnLevel: number;
 };

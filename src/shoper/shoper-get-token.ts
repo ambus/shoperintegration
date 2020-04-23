@@ -19,11 +19,11 @@ export class ShoperGetToken {
         retryWhen(
           retryStrategy({
             maxRetryAttempts: maxRetryAttempts,
-            scalingDuration: delayTimeInMilisec
+            scalingDuration: delayTimeInMilisec,
           })
         ),
-        timeout(delayTimeInMilisec + delayTimeInMilisec * maxRetryAttempts),
-        catchError(err => {
+        timeout(maxRetryAttempts * delayTimeInMilisec + delayTimeInMilisec),
+        catchError((err) => {
           return throwError(new ErrorInTask("Napotkano błąd podczas pobierania tokena uwierzytelniającego", err, ErrorType.TOKEN_GET));
         })
       );
@@ -36,7 +36,7 @@ export class ShoperGetToken {
   }
 
   static _getAjaxConnection(userToken: string, refreshToken: boolean): Observable<AjaxResponse> {
-    let createXHR = function() {
+    let createXHR = function () {
       return new XMLHttpRequest();
     };
     return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } });

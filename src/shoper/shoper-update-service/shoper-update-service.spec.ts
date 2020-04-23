@@ -152,7 +152,7 @@ describe("shoperUpdateService - błędy połączenia", () => {
     shoperUpdateService.updateStock(stringGenerator(), taskMockup).subscribe(
       (observer: number) => {},
       err => {
-        expect(startTime + errorDelayTIme).toBeLessThan(Date.now());
+        expect(startTime + errorDelayTIme).toBeLessThanOrEqual(Date.now());
         expect(err.error.name).toBe("TimeoutError");
         done();
       }

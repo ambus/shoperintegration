@@ -8,7 +8,8 @@ export const taskMockup: Task = {
   filonMerchandise: {
     product_code: stringGenerator(),
     stock: 15,
-    price: "100"
+    price: "100",
+    warnLevel: 2
   },
   status: TaskShoperRequestStatusValue.making,
   attemptCounter: 1,

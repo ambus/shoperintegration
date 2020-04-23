@@ -8,7 +8,7 @@ import { Task } from "../../models/task";
 
 describe("setStatusToTaskRequest", () => {
   it("po przekazaniu zadania funkcja powinna ustawić zadany task i zwrócić subskrybcję", done => {
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
+    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
     let task = createTaskRequest(filonMerchandise);
     expect(task.status).toEqual(TaskShoperRequestStatusValue.requested);
     of(task)

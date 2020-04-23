@@ -150,7 +150,7 @@ describe("shoperStockService - błędy połączenia", () => {
       (val: ShoperStock ) => {
       },
       err => {
-        expect(startTime + errorDelayTIme).toBeLessThan(Date.now());
+        expect(startTime + errorDelayTIme).toBeLessThanOrEqual(Date.now());
         expect(err.name).toBe("TimeoutError")
         done();
       }

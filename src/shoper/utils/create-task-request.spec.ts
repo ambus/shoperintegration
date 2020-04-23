@@ -3,7 +3,7 @@ import { FilonMerchandise } from "../../models/filon-merchandise";
 import { stringGenerator } from "../../lib/string-generator";
 describe("createTaskRequest", () => {
   it("po przekazaniu do funkcji obiektu typu filonMerchandise powinien zwrócić obiekt typu Task", () => {
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00" };
+    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
     let task = createTaskRequest(filonMerchandise);
     expect(task.id).toBeDefined();
     expect(task.id.length).toBeGreaterThan(5);

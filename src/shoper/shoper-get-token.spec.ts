@@ -13,14 +13,14 @@ describe("shoperGetToken", () => {
     mockup_shoperGetToken();
   });
 
-  it("powinien zwracać string z tokenem", done => {
+  it("powinien zwracać string z tokenem", (done) => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       done();
     });
   });
 
-  it("przy drugim wywołaniu powinna zwrócić ten sam token", done => {
+  it("przy drugim wywołaniu powinna zwrócić ten sam token", (done) => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       mockupData_shoperGetToken.response.access_token = stringGenerator();
@@ -31,7 +31,7 @@ describe("shoperGetToken", () => {
     });
   });
 
-  it("przy drugim wywołaniu i refreshu powinna zwrócić nowy obiekt", done => {
+  it("przy drugim wywołaniu i refreshu powinna zwrócić nowy obiekt", (done) => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       mockupData_shoperGetToken.response.access_token = stringGenerator();
@@ -48,7 +48,7 @@ describe("shoperGetToken", () => {
 });
 
 describe("shoperGetToken - błędy połączenia", () => {
-  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd", done => {
+  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd", (done) => {
     let errorString = "Błąd przy pobieraniu tokena";
     let counter = -1;
     jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
@@ -60,7 +60,7 @@ describe("shoperGetToken - błędy połączenia", () => {
 
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, 200, 3).subscribe(
       (val: string) => {},
-      err => {
+      (err) => {
         expect(counter).toBe(3);
         expect(err.message).toBe("Napotkano błąd podczas pobierania tokena uwierzytelniającego");
         done();
@@ -68,21 +68,18 @@ describe("shoperGetToken - błędy połączenia", () => {
     );
   });
 
-  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", done => {
-    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
-      Observable.create((observer: AnonymousSubject<any>) => {
-      })
-    );
+  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", (done) => {
+    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(Observable.create((observer: AnonymousSubject<any>) => {}));
     const startTime = Date.now();
 
-    const delayTimeInMilisec = 200;
+    const delayTimeInMilisec = 50;
     const maxRetryAttempts = 3;
 
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, delayTimeInMilisec, maxRetryAttempts).subscribe(
       (val: string) => {},
-      err => {
+      (err) => {
         expect(startTime + delayTimeInMilisec + delayTimeInMilisec * maxRetryAttempts).toBeLessThan(Date.now());
-        expect(err.error.name).toBe("TimeoutError")
+        expect(err.error.name).toBe("TimeoutError");
         done();
       }
     );

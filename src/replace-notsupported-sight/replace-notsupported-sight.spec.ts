@@ -7,7 +7,8 @@ let filonMerchandisesMockup: FilonMerchandise[] = [
     product_code: "BSZK0F1FLE051#",
     stock: 2,
     price: "139,57",
-    priceE: "15,00"
+    priceE: "15,00",
+    warnLevel: 2
   }
 ];
 describe("replaceComma", () => {
