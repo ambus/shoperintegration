@@ -18,4 +18,5 @@ export type ConfigElement = {
   smtpConfig: SMTPConfig;
   emailNoticication: EmailNoticication;
   backup: BackupConfig;
+  timeout: number;
 };

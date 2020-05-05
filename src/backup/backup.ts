@@ -20,6 +20,7 @@ export class Backup {
           if (this.config.backup.status) {
             let stringToSave = filonMerchandisesString;
             if (fs.existsSync(this.backupFileName)) {
+              stringToSave = filonMerchandisesString.replace("product_code;stock;price;priceE;warnLevel", "");
               stringToSave = filonMerchandisesString.replace("product_code;stock;price;priceE", "");
             }
             fs.appendFileSync(this.backupFileName, stringToSave, { encoding: "utf8" });

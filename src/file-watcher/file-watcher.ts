@@ -26,7 +26,7 @@ export class FileWatcher {
           this.readFileAndSendThemToStream(`${filePath}/${fileName}`, observer, false);
         }
         this.watchFile(filePath)
-          .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)))
+          .pipe(tap(val => this.logger.info("Watcher zaobserwował zmiany w podanym katalogu", val)),)
           .subscribe((path: string) => {
             if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, observer);
           });
@@ -46,9 +46,9 @@ export class FileWatcher {
       )
       .subscribe(
         (res: string) => stream.next(res),
-        (err: any) => {
+        (err: string) => {
           this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err);
-          if (sendEmail) {
+          if (sendEmail && !err.includes('resource busy or locked')) {
             let message = `Podczas próby odczyty pliku ${filePath}, napotkano błąd. Treść błędu: ${err}`;
             let messageHtml = `<h2>Błąd</h2>
             <h3>Błąd podczas odczytu pliku ${filePath}, napotkano błąd!</h3>
@@ -65,17 +65,21 @@ export class FileWatcher {
 
   public readFile(filePath: string): Observable<string> {
     return Observable.create((observer: AnonymousSubject<string>) => {
-      fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
-        if (err) {
-          this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-          observer.error(err);
-          observer.complete();
-        } else {
-          this.logger.info(`Odczytano nowe dane:`, data);
-          observer.next(data);
-          observer.complete();
-        }
-      });
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          fs.readFile(filePath, this.config.encoding, (err: Error, data: string) => {
+            if (err) {
+              this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
+              observer.error(err);
+              observer.complete();
+            } else {
+              this.logger.info(`Odczytano nowe dane:`, data);
+              observer.next(data);
+              observer.complete();
+            }
+          });
+        }, this.config.timeout || 100);
+      })
     });
   }
 

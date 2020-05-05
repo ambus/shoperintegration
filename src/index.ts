@@ -27,7 +27,7 @@ export class Index {
     this.fw = new FileWatcher(this.config);
     this.shoperService = new ShoperService(this.config);
     this.shoperService.doneTask$.subscribe(task => {
-      this.logger.info("Zakończono wykonywanie taska", task);
+      this.logger.info(`Zakończono wykonywanie taska ${task.id} ze statusem ${task.status}`);
     });
     this.backup = new Backup(this.config);
     this.eMail = new EMail(this.config);

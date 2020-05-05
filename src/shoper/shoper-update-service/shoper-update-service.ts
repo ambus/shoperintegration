@@ -33,6 +33,7 @@ export class ShoperUpdateService {
   }
 
   _pushAjaxShoperUpdate(userToken: string, task: Task): Observable<AjaxResponse> {
+    this.logger.debug(`Dane do aktualizacji ${JSON.stringify(task.stockToUpdate)}`)
     let createXHR = function() {
       return new XMLHttpRequest();
     };
@@ -68,7 +69,7 @@ export class ShoperUpdateService {
         ),
         map((val: { outerValue: Task; innerValue: number; outerIndex: number; innerIndex: number }) => {
           val.outerValue.updateStatus = val.innerValue;
-          this.logger.info(`Status aktualizacji towaru: ${val.innerValue}, Task: `, val.outerValue);
+          this.logger.info(`Status aktualizacji towaru: ${val.innerValue}, Task: `, val.outerValue.id);
           return val.outerValue;
         }),
         catchError((err: any, caught: Observable<Task>) => {

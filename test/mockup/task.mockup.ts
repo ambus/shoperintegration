@@ -17,5 +17,5 @@ export const taskMockup: Task = {
   endTime: 1,
   shoperConnectionTokenID: stringGenerator(),
   shoperStock: shoperStockMockup.response.list[0],
-  stockToUpdate: { stock: "12" }
+  stockToUpdate: { stock: "12", warn_level: "2" }
 };

@@ -24,6 +24,7 @@ export class Config {
   public smtpConfig: SMTPConfig;
   public emailNoticication: EmailNoticication;
   public backup: BackupConfig;
+  public timeout: number;
 
   private constructor(private fileLocation: string) {
     this.loadConfiguration(fileLocation);
@@ -51,6 +52,7 @@ export class Config {
       this.smtpConfig = config.smtpConfig;
       this.emailNoticication = config.emailNoticication;
       this.backup = config.backup;
+      this.timeout = config.timeout;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
       let config = this.loadDefaultConfiguration();
@@ -66,6 +68,8 @@ export class Config {
       this.emailNoticication = config.emailNoticication;
 
       this.backup = config.backup;
+      this.timeout = config.timeout;
+
     }
   }
 
@@ -128,7 +132,8 @@ export class Config {
       backup: {
         filelocation: "./",
         status: false
-      }
+      },
+      timeout: 100
     };
   }
 }

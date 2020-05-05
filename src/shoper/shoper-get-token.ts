@@ -7,13 +7,16 @@ import { Config } from "../config/config";
 import { retryStrategy } from "./utils/retry-strategy";
 import { ErrorInTask } from "../models/error-in-task";
 import { ErrorType } from "../models/error-type";
+import { getLogger } from "log4js";
 
+const logger = getLogger("ShoperGetToken");
 export class ShoperGetToken {
   static authorizationToken: string;
 
   static getToken(userToken: string, refreshToken: boolean, delayTimeInMilisec: number = 1000, maxRetryAttempts: number = 3): Observable<string> {
     if (refreshToken || !this.authorizationToken) {
       return this._getAjaxConnection(userToken, refreshToken).pipe(
+        tap(console.warn),
         map((token: AjaxResponse) => token.response.access_token),
         tap((token: string) => (this.authorizationToken = token)),
         retryWhen(
@@ -22,7 +25,6 @@ export class ShoperGetToken {
             scalingDuration: delayTimeInMilisec,
           })
         ),
-        timeout(maxRetryAttempts * delayTimeInMilisec + delayTimeInMilisec),
         catchError((err) => {
           return throwError(new ErrorInTask("Napotkano błąd podczas pobierania tokena uwierzytelniającego", err, ErrorType.TOKEN_GET));
         })
