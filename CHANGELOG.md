@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.16](https://github.com/ambus/shoperintegration/compare/v1.5.15...v1.5.16) (2020-05-10)
+
+
+
 ### [1.5.15](https://github.com/ambus/shoperintegration/compare/v1.5.14...v1.5.15) (2020-05-08)
 
 
