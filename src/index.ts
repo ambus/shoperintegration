@@ -1,5 +1,5 @@
 import { configure, getLogger, Logger } from "log4js";
-import { iif, of, throwError } from "rxjs";
+import { iif, of, throwError, Subscription } from "rxjs";
 import { concatMap, delay, retryWhen, tap } from "rxjs/operators";
 import { Config } from "./config/config";
 import { parseCSVDataStream } from "./csv-parser/csv-parser";
@@ -21,21 +21,21 @@ export class Index {
   shoperService: ShoperService;
   eMail: EMail;
   backup: Backup;
+  fwStream: Subscription;
+  shoperStream: Subscription;
 
   constructor(configFileName: string) {
     this.init(configFileName);
     this.fw = new FileWatcher(this.config);
     this.shoperService = new ShoperService(this.config);
-    this.shoperService.doneTask$.subscribe(task => {
+    this.shoperStream = this.shoperService.doneTask$.subscribe((task) => {
       this.logger.info(`Zakończono wykonywanie taska ${task.id} ze statusem ${task.status}`);
     });
     this.backup = new Backup(this.config);
     this.eMail = new EMail(this.config);
     let message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticication.adminsNotifications}`;
-    let messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${
-      this.config.emailNoticication.adminsNotifications
-    }</p><b>Życzymy miłego dnia 😀</b>`;
-    this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, this.config.emailNoticication.alerts);
+    let messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${this.config.emailNoticication.adminsNotifications}</p><b>Życzymy miłego dnia 😀</b>`;
+    this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, [this.config.emailNoticication.alerts[0]]);
   }
 
   init(configFileName: string): void {
@@ -45,14 +45,14 @@ export class Index {
     this.logger.debug("Start serwisu shoperintergration");
   }
 
-  retryPipeline = retryWhen(errors =>
+  retryPipeline = retryWhen((errors) =>
     errors.pipe(
       concatMap((e, i) =>
         iif(
           () => i >= this.config.attempsWhenError,
           throwError(e),
           of(e).pipe(
-            tap(val => (this.readFileOnStart = false)),
+            tap((val) => (this.readFileOnStart = false)),
             delay(this.config.errorDelayTime)
           )
         )
@@ -61,10 +61,10 @@ export class Index {
   );
 
   startWatchFile(): void {
-    this.fw
+    this.fwStream = this.fw
       .startWatch(this.config.fileInfo.path, this.config.fileInfo.fileName, this.readFileOnStart)
       .pipe(
-        tap(val => this.logger.debug("Nowe dane w strumieniu", val)),
+        tap((val) => this.logger.debug("Nowe dane w strumieniu", val)),
         this.backup.addNewFilonData(),
         this.retryPipeline,
         parseCSVDataStream(this.config.parserOptions),
@@ -73,16 +73,33 @@ export class Index {
       )
       .subscribe(
         (filonMerchandises: FilonMerchandise[]) => {
-        this.logger.debug(`Sparsowane dane ${filonMerchandises}. Dane zostaną przekazane do nowego taska`);
+          this.logger.debug(`Sparsowane dane ${filonMerchandises}. Dane zostaną przekazane do nowego taska`);
           filonMerchandises.forEach((filonItems: FilonMerchandise) => {
             this.shoperService.addTask(filonItems);
           });
         },
-        err => {}
+        (err) => {}
       );
+  }
+
+  destroy() {
+    this.shoperStream && this.shoperStream.unsubscribe();
+    this.fwStream && this.fwStream.unsubscribe();
+    this.fw && this.fw.close();
   }
 }
 
-var main = (function() {
-  new Index(CONFIG_FILE_NAME).startWatchFile();
+var main = (function () {
+  let index: Index;
+  index && index.destroy();
+  index = new Index(CONFIG_FILE_NAME);
+  index.startWatchFile();
+  setInterval(async () => {
+    index && index.destroy();
+    await setTimeout(() => {
+      console.log(".....");
+    }, 10000);
+    index = new Index(CONFIG_FILE_NAME);
+    index.startWatchFile();
+  }, 1000 * 60 * 60 * 24);
 })();
