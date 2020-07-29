@@ -24,7 +24,7 @@ export class ShoperService {
   shoperStockService: ShoperStockService;
   shoperUpdateService: ShoperUpdateService;
   compareService: CompareService;
-  config: Config
+  config: Config;
 
   constructor(public configuration: Config) {
     this.config = configuration;
@@ -56,11 +56,10 @@ export class ShoperService {
         this.shoperStockService.setShoperStock(),
         this.compareService.generateItemToUpdate(),
         this.shoperUpdateService.updateShoperStock(),
-        catchError(err => {
+        catchError((err) => {
           task.status = TaskShoperRequestStatusValue.error;
           task.error = err;
           return of(task);
-
         }),
         finalize(() => this.logger.debug("Zakończono działanie sekwencji w switchMap - doingTask"))
       )
@@ -79,7 +78,7 @@ export class ShoperService {
             outerValue,
             innerValue,
             outerIndex,
-            innerIndex
+            innerIndex,
           })
         ),
         map((val: { outerValue: Task; innerValue: string; outerIndex: number; innerIndex: number }) => {
@@ -87,7 +86,7 @@ export class ShoperService {
           this.logger.debug(`Pobrany token połączenia: ${val.innerValue}`);
           return val.outerValue;
         }),
-        catchError(err => {
+        catchError((err) => {
           this.logger.error(`Napotkano błąd podczas ustawiania tokena połączenia: `, err, taskToUpdate);
           return throwError(err);
         })
@@ -118,7 +117,7 @@ export class ShoperService {
                   if (
                     task.error &&
                     this.config.emailNoticication.sendNotificationToErrorTypes.length > 0 &&
-                    this.config.emailNoticication.sendNotificationToErrorTypes.find((type: string) => task.error.errorType === type)
+                    (this.config.emailNoticication.sendNotificationToErrorTypes.find((type: string) => task.error.errorType === type) || typeof task.error.errorType === "undefined")
                   ) {
                     this.sendEmailWithErrorMessage(task);
                   }
@@ -135,7 +134,7 @@ export class ShoperService {
     setEndTime(),
     tap((request: Task) => this.logger.debug(`Zakończono pracę przy zadaniu o id ${request.id}, czas zakończenia pracy ${new Date(request.endTime).toLocaleTimeString()}.`)),
     tap((request: Task) => this.connectionPoolIsFree$.next()),
-    catchError(err => {
+    catchError((err) => {
       this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
       let message = `Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd. Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.
       Napotkany błąd spowodował zakończenie strumienia. Niezbędny jest restart serwisu oraz ręczna aktualizacja danych w systemie shoper!. Treść błędu: ${JSON.stringify(err)}`;
