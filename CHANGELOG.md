@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/ambus/shoperintegration/compare/v1.5.17...v1.6.0) (2020-07-29)
+
+
+### Bug Fixes
+
+* send email if error type is undefinded ([0b29b54](https://github.com/ambus/shoperintegration/commit/0b29b54))
+
+
+### Features
+
+* add support for stop watching ([7fec8d1](https://github.com/ambus/shoperintegration/commit/7fec8d1))
+* **index:** add time interval to restart service ([b02171e](https://github.com/ambus/shoperintegration/commit/b02171e))
+
+
+
 ### [1.5.17](https://github.com/ambus/shoperintegration/compare/v1.5.16...v1.5.17) (2020-05-11)
 
 
