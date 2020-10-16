@@ -197,6 +197,6 @@ export class ShoperService {
         <br />
         <p><i>Zadanie przekazane do systemu: </i><pre><code>${JSON.stringify(task)}</code></pre></p>
       `;
-    this.eMail.sendMail(`🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticication.alerts);
+    this.eMail.sendMail(`StanyMagazynowe - 🔥Nie można ukończyć zadania aktualizacji danych dla towaru ${task.filonMerchandise.product_code}`, message, messageHtml, this.config.emailNoticication.alerts);
   }
 }
