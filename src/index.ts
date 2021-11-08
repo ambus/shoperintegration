@@ -10,6 +10,7 @@ import { ShoperService } from "./shoper/shoper-service";
 import { EMail } from "./mail/email";
 import { Backup } from "./backup/backup";
 import { replaceNotSupportedSight } from "./replace-notsupported-sight/replace-notsupported-sight";
+import { ShoperGetToken } from "./shoper/shoper-get-token";
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -83,6 +84,7 @@ export class Index {
   }
 
   destroy() {
+    ShoperGetToken.authorizationToken = undefined;
     this.shoperStream && this.shoperStream.unsubscribe();
     this.fwStream && this.fwStream.unsubscribe();
     this.fw && this.fw.close();
