@@ -1,12 +1,12 @@
-import { Configuration } from "log4js";
 import * as fs from "fs";
+import { Configuration } from "log4js";
+import { BackupConfig } from "../models/backup-config";
 import { ConfigElement } from "../models/config-element";
-import { ParserOptions } from "../models/parser-options";
+import { EmailNoticication } from "../models/email-notifications-list";
 import { FileInfo } from "../models/file-info";
+import { ParserOptions } from "../models/parser-options";
 import { ShoperConfig } from "../models/shoper-config";
 import { SMTPConfig } from "../models/smtp-config";
-import { EmailNoticication } from "../models/email-notifications-list";
-import { BackupConfig } from "../models/backup-config";
 
 export const DEFAULT_CONFIG_FILE_PATH = "config.json";
 
@@ -39,49 +39,36 @@ export class Config {
   }
 
   public loadConfiguration(filePath: string): void {
+    let config: ConfigElement = this.loadDefaultConfiguration();
     try {
-      let config = JSON.parse(fs.readFileSync(filePath, "utf8"));
-      this.log4js = config.log4js;
+      config = JSON.parse(fs.readFileSync(filePath, "utf8"));
       this.configurationType = `File ${filePath}`;
-      this.encoding = config.encoding;
-      this.parserOptions = config.parserOptions;
-      this.fileInfo = config.fileInfo;
-      this.errorDelayTime = config.errorDelayTime;
-      this.attempsWhenError = config.attempsWhenError;
-      this.shoperConfig = config.shoperConfig;
-      this.smtpConfig = config.smtpConfig;
-      this.emailNoticication = config.emailNoticication;
-      this.backup = config.backup;
-      this.timeout = config.timeout;
     } catch (err) {
       console.error(`Napotkano błąd podczas pobierania konfiguracji. Próbowano odnaleść plik konfiguracyjny pod adresem ${DEFAULT_CONFIG_FILE_PATH}. Ustawiono domyślną konfigurację`, err);
-      let config = this.loadDefaultConfiguration();
-      this.log4js = config.log4js;
-      this.configurationType = config.configurationType;
-      this.encoding = config.encoding;
-      this.parserOptions = config.parserOptions;
-      this.fileInfo = config.fileInfo;
-      this.errorDelayTime = config.errorDelayTime;
-      this.attempsWhenError = config.attempsWhenError;
-      this.shoperConfig = config.shoperConfig;
-      this.smtpConfig = config.smtpConfig;
-      this.emailNoticication = config.emailNoticication;
-
-      this.backup = config.backup;
-      this.timeout = config.timeout;
-
     }
+    this.log4js = config.log4js;
+    this.configurationType = this.configurationType ?? config.configurationType;
+    this.encoding = config.encoding;
+    this.parserOptions = config.parserOptions;
+    this.fileInfo = config.fileInfo;
+    this.errorDelayTime = config.errorDelayTime;
+    this.attempsWhenError = config.attempsWhenError;
+    this.shoperConfig = config.shoperConfig;
+    this.smtpConfig = config.smtpConfig;
+    this.emailNoticication = config.emailNoticication;
+    this.backup = config.backup;
+    this.timeout = config.timeout;
   }
 
   public loadDefaultConfiguration(): ConfigElement {
     return {
       log4js: {
         appenders: {
-          out: { type: "stdout" }
+          out: { type: "stdout" },
         },
         categories: {
-          default: { appenders: ["out"], level: "trace" }
-        }
+          default: { appenders: ["out"], level: "trace" },
+        },
       },
       encoding: "utf8",
       parserOptions: {
@@ -90,12 +77,12 @@ export class Config {
         skip_empty_lines: true,
         skip_lines_with_error: true,
         trim: true,
-        cast: true
+        cast: true,
       },
       configurationType: "default",
       fileInfo: {
         path: "tmp",
-        fileName: "test.csv"
+        fileName: "test.csv",
       },
       errorDelayTime: 5000,
       attempsWhenError: 5,
@@ -104,11 +91,11 @@ export class Config {
           token: "",
           productStocks: "",
           products: "",
-          productStocksUpdate: ""
+          productStocksUpdate: "",
         },
         userToken: "",
         delayTimeInMilisec: 800,
-        maxRetryAttempts: 3
+        maxRetryAttempts: 3,
       },
       smtpConfig: {
         from: "",
@@ -116,24 +103,24 @@ export class Config {
         port: 587,
         auth: {
           user: "",
-          pass: ""
+          pass: "",
         },
         ignoreTLS: true,
         tls: {
-          ciphers: "SSLv3"
+          ciphers: "SSLv3",
         },
-        status: false
+        status: false,
       },
       emailNoticication: {
         alerts: [],
         adminsNotifications: [],
-        sendNotificationToErrorTypes: ["undefined", "update_errror"]
+        sendNotificationToErrorTypes: ["undefined", "update_errror"],
       },
       backup: {
         filelocation: "./",
-        status: false
+        status: false,
       },
-      timeout: 100
+      timeout: 100,
     };
   }
 }
