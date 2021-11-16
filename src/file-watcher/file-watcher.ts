@@ -1,21 +1,22 @@
 import { getLogger, Logger } from "log4js";
-import { Observable, Subject, pipe, EMPTY, Subscription } from "rxjs";
-import { tap, retry, catchError, retryWhen } from "rxjs/operators";
+import { Observable, Subject, Subscription } from "rxjs";
+import { tap, retryWhen } from "rxjs/operators";
 import * as fs from "fs";
 import { watch, FSWatcher } from "chokidar";
 import { Config } from "../config/config";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { EMail } from "../mail/email";
 import { retryStrategy } from "../shoper/utils/retry-strategy";
-import { runInThisContext } from "vm";
 
 export class FileWatcher {
   public logger: Logger;
   private config: Config;
-  private eMail: EMail;
+  public eMail: EMail;
   private watcher: FSWatcher;
   private readFileStream: Subscription;
   private watchFileStream: Subscription;
+  public maxFileReadRetryAttempts = 50;
+  public fileReadScalingDuration = 500;
 
   constructor(config: Config) {
     this.logger = getLogger("fileWatcher");
@@ -36,20 +37,20 @@ export class FileWatcher {
             if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, observer);
           });
       } catch (err) {
-        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie strumienia`, err);
+        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie aplikacji!`, err);
         observer.error(err);
       }
     });
   }
 
-  public readFileAndSendThemToStream(filePath: string, stream: Subject<string>, sendEmail: boolean = true): void {
+  public readFileAndSendThemToStream(filePath: string, stream: Subject<string>, sendEmail = true): void {
     this.readFileStream = this.readFile(filePath)
       .pipe(
-        tap((val) => this.logger.info("Odczytano nowe dane")),
+        tap((_val) => this.logger.info("Odczytano nowe dane")),
         retryWhen(
           retryStrategy({
-            maxRetryAttempts: 50,
-            scalingDuration: 500,
+            maxRetryAttempts: this.maxFileReadRetryAttempts,
+            scalingDuration: this.fileReadScalingDuration,
           })
         ),
         tap(() => this.deleteFile(filePath))
@@ -58,10 +59,10 @@ export class FileWatcher {
         (res: string) => stream.next(res),
         (err: string) => {
           this.logger.error(`Błąd podczas odczytu pliku ${filePath}`, err);
-          if (sendEmail && !err.includes("resource busy or locked")) {
-            let message = `Podczas próby odczyty pliku ${filePath}, napotkano błąd. Treść błędu: ${err}`;
-            let messageHtml = `<h2>Błąd</h2>
-            <h3>Błąd podczas odczytu pliku ${filePath}, napotkano błąd!</h3>
+          if (sendEmail && !(typeof err === "string" && err?.includes("resource busy or locked"))) {
+            const message = `Podczas próby odczyty pliku ${filePath}, napotkano błąd. Treść błędu: ${err}`;
+            const messageHtml = `<h2>Błąd</h2>
+            <h3>Błąd podczas odczytu pliku ${filePath}!</h3>
             <p style="">Treść błędu 
             <pre><code>${err}</code></pre>
             </p>
@@ -69,31 +70,30 @@ export class FileWatcher {
             `;
             this.eMail.sendMail(`🔥Nie można odczytać pliku ${filePath}`, message, messageHtml, this.config.emailNoticication.alerts);
           }
-          stream.next('');
+          stream.next("");
         }
       );
   }
 
   public readFile(filePath: string): Observable<string> {
     return Observable.create((observer: AnonymousSubject<string>) => {
-      new Promise((resolve, reject) => {
+      new Promise((_resolve, _reject) => {
         setTimeout(() => {
           try {
             fs.readFile(filePath, this.config.encoding, (err: any, data: string) => {
               if (err) {
                 this.logger.error(`Napotkano błąd podczas próby odczytu pliku ${filePath}:`, err);
-                if(err?.code === 'ENOENT') {
-                  observer.next('');
-                  observer.complete();
+                if (err?.code === "ENOENT") {
+                  observer.next("");
                 } else {
                   observer.error(err);
-                  observer.complete();
                 }
               } else {
                 this.logger.info(`Odczytano nowe dane:`, data);
                 observer.next(data);
-                observer.complete();
               }
+
+              observer.complete();
             });
           } catch (err) {
             observer.error(err);
