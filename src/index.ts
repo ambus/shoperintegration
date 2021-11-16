@@ -18,7 +18,7 @@ export class Index {
   logger: Logger;
   config: Config;
   fw: FileWatcher;
-  readFileOnStart: boolean = false;
+  readFileOnStart = false;
   shoperService: ShoperService;
   eMail: EMail;
   backup: Backup;
@@ -34,8 +34,8 @@ export class Index {
     });
     this.backup = new Backup(this.config);
     this.eMail = new EMail(this.config);
-    let message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticication.adminsNotifications}`;
-    let messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${this.config.emailNoticication.adminsNotifications}</p><b>Życzymy miłego dnia 😀</b>`;
+    const message = `Właśnie został ponownie uruchomiony serwis shoperintegrations. W razie pytań prosimy o kontakt z administratorem ${this.config.emailNoticication.adminsNotifications}`;
+    const messageHtml = `<h3>Właśnie został ponownie uruchomiony serwis shoperintegrations.</h3> <p>W razie pytań prosimy o kontakt z administratorem 👨🏽‍💻 ${this.config.emailNoticication.adminsNotifications}</p><b>Życzymy miłego dnia 😀</b>`;
     this.eMail.sendMail(`🎉 Nastąpił restart systemu shoperingegration`, message, messageHtml, [this.config.emailNoticication.alerts[0]]);
   }
 
@@ -72,15 +72,12 @@ export class Index {
         replaceCommaInPrice(),
         replaceNotSupportedSight()
       )
-      .subscribe(
-        (filonMerchandises: FilonMerchandise[]) => {
-          this.logger.debug(`Sparsowane dane ${filonMerchandises}. Dane zostaną przekazane do nowego taska`);
-          filonMerchandises.forEach((filonItems: FilonMerchandise) => {
-            this.shoperService.addTask(filonItems);
-          });
-        },
-        (err) => {}
-      );
+      .subscribe((filonMerchandises: FilonMerchandise[]) => {
+        this.logger.debug(`Sparsowane dane ${filonMerchandises}. Dane zostaną przekazane do nowego taska`);
+        filonMerchandises.forEach((filonItems: FilonMerchandise) => {
+          this.shoperService.addTask(filonItems);
+        });
+      });
   }
 
   destroy() {
@@ -91,7 +88,7 @@ export class Index {
   }
 }
 
-var main = (function () {
+const main = (function () {
   let index: Index;
   index && index.destroy();
   index = new Index(CONFIG_FILE_NAME);

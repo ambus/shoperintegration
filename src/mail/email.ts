@@ -6,6 +6,7 @@ import { AnonymousSubject } from "rxjs/internal/Subject";
 import smtpTransport = require("nodemailer-smtp-transport");
 import nodemailer = require("nodemailer");
 import { Logger, getLogger } from "log4js";
+import { take } from "rxjs/operators";
 
 export class EMail {
   private _transporter: Mail;
@@ -22,22 +23,21 @@ export class EMail {
           port: config.smtpConfig.port,
           auth: config.smtpConfig.auth,
           ignoreTLS: config.smtpConfig.ignoreTLS,
-          tls: config.smtpConfig.tls
+          tls: config.smtpConfig.tls,
         })
       ));
   }
-  
 
-  sendMail(subject: string = "Wiadomość od boota serwisu ShoperService", message: string = "Cześć 😀", messageHtml: string = "", mailTo: Array<string> = [""], ...args: any) {
+  sendMail(subject = "Wiadomość od boota serwisu ShoperService", message = "Cześć 😀", messageHtml = "", mailTo: Array<string> = [""], ...args: any) {
     if (this._config.smtpConfig.status) {
-      this.sendMailObservable(subject, message, messageHtml, mailTo).subscribe();
+      this.sendMailObservable(subject, message, messageHtml, mailTo).pipe(take(1)).subscribe();
     }
   }
 
   sendMailObservable(
-    subject: string = "Wiadomość od boota serwisu ShoperService",
-    message: string = "Cześć 😀",
-    messageHtml: string = "",
+    subject = "Wiadomość od boota serwisu ShoperService",
+    message = "Cześć 😀",
+    messageHtml = "",
     mailTo: Array<string>,
     ...args: any
   ): Observable<SMTPTransport.SentMessageInfo> {
@@ -50,7 +50,7 @@ export class EMail {
           to: mailTo,
           subject: subject,
           text: message,
-          html: messageHtml
+          html: messageHtml,
         };
         this._transporterSendMail(mailOptions, observer);
       }

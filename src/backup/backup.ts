@@ -14,8 +14,8 @@ export class Backup {
   }
 
   addNewFilonData(): OperatorFunction<string, string> {
-    return (source: Observable<string>) => {
-      return source.pipe(
+    return (source: Observable<string>) =>
+      source.pipe(
         map((filonMerchandisesString: string) => {
           if (this.config.backup.status) {
             let stringToSave = filonMerchandisesString;
@@ -27,18 +27,17 @@ export class Backup {
           }
           return filonMerchandisesString;
         }),
-        catchError((err: any, caught: Observable<string>) => {
+        catchError((err: unknown, caught: Observable<string>) => {
           this.logger.error(`Nie można zapisać danych do pliku z backupem`, err);
           throwError(err);
           return caught;
         })
       );
-    };
   }
 
   get backupFileName(): string {
-    let dateToConvert = new Date();
-    var newDate = `${dateToConvert.getFullYear()}-${dateToConvert.getMonth() < 9 ? "0" : ""}${dateToConvert.getMonth() + 1}-${dateToConvert.getDate() < 10 ? "0" : ""}${dateToConvert.getDate()}.bac`;
+    const dateToConvert = new Date();
+    const newDate = `${dateToConvert.getFullYear()}-${dateToConvert.getMonth() < 9 ? "0" : ""}${dateToConvert.getMonth() + 1}-${dateToConvert.getDate() < 10 ? "0" : ""}${dateToConvert.getDate()}.bac`;
     return `${this.config.backup.filelocation}/${newDate}`;
   }
 }

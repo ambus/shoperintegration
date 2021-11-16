@@ -3,7 +3,7 @@ import * as fs from "fs";
 
 const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
-fdescribe("config", () => {
+describe("config", () => {
   describe("Konfiguracja", () => {
     let config: Config;
     beforeAll(() => {
