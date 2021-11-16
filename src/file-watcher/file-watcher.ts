@@ -37,7 +37,7 @@ export class FileWatcher {
             if (this.changesHaveOccurredInTheObservableFile(path, `${filePath}/${fileName}`)) this.readFileAndSendThemToStream(path, observer);
           });
       } catch (err) {
-        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}${fileName}. Wymagane jest ponowne uruchomienie aplikacji!`, err);
+        this.logger.error(`Napotkano błąd podczas odczytu pliku ${filePath}/${fileName}. Wymagane jest ponowne uruchomienie aplikacji!`, err);
         observer.error(err);
       }
     });
