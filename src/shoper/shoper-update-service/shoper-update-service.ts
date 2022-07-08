@@ -34,11 +34,11 @@ export class ShoperUpdateService {
 
   _pushAjaxShoperUpdate(userToken: string, task: Task): Observable<AjaxResponse> {
     this.logger.debug(`Dane do aktualizacji ${JSON.stringify(task.stockToUpdate)}`)
-    let createXHR = function() {
+    const createXHR = function() {
       return new XMLHttpRequest();
     };
     if (task.shoperStock && task.shoperStock.stock_id) {
-      let url = `${this.config.shoperConfig.urls.productStocks}/${task.shoperStock.stock_id}`;
+      const url = `${this.config.shoperConfig.urls.productStocks}/${task.shoperStock.stock_id}`;
       return ajax({
         createXHR,
         url: url,

@@ -11,54 +11,65 @@ import { Task } from "./models/task";
 import { ErrorType } from "./models/error-type";
 const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
-var index: Index;
+let index: Index;
 beforeAll(() => {
   spyOn(console, "error");
   index = new Index(TEST_CONFIG_FILE_PATH);
-  spyOn(index.logger, "trace").and.callFake(() => {});
-  spyOn(index.logger, "debug").and.callFake(() => {});
+  spyOn(index.logger, "trace").and.callFake(() => {
+    return;
+  });
+  spyOn(index.logger, "debug").and.callFake(() => {
+    return;
+  });
 });
 
 describe("Index", () => {
-  it("powinien zawierać instancję loggera", done => {
+  it("powinien zawierać instancję loggera", (done) => {
     expect(index.logger).toBeDefined();
     done();
   });
 
-  it("index.ts powinien zawierać załadowaną konfigurację z pliku config.json", done => {
+  it("index.ts powinien zawierać załadowaną konfigurację z pliku config.json", (done) => {
     expect(index.config).toBeDefined();
     done();
   });
 
-  it("w konfiguracji powinien znajdować się obiekt log4js z konfiguracją dla loggiera", done => {
+  it("w konfiguracji powinien znajdować się obiekt log4js z konfiguracją dla loggiera", (done) => {
     expect(index.config.log4js).toBeDefined();
     done();
   });
 
-  it("typ konfiguracji powinien wskazywać na plik", done => {
+  it("typ konfiguracji powinien wskazywać na plik", (done) => {
     expect(index.config.configurationType).toBeDefined();
     expect(index.config.configurationType).toContain(TEST_CONFIG_FILE_PATH);
     done();
   });
 
-  it("retryWhen gdy napotka błędy powinien próbowac podjąć ponowną próbe subskrybcji określoną ilość razy z przerwą określoną w konfiguracji", done => {
+  it("retryWhen gdy napotka błędy powinien próbowac podjąć ponowną próbe subskrybcji określoną ilość razy z przerwą określoną w konfiguracji", (done) => {
     let index = 0;
-    let index2: Index;
-    index2 = new Index(TEST_CONFIG_FILE_PATH);
-    let obser = Observable.create((observer: AnonymousSubject<string>) => {
+
+    const index2 = new Index(TEST_CONFIG_FILE_PATH);
+    const obser = Observable.create((observer: AnonymousSubject<string>) => {
       if (index >= index2.config.attempsWhenError) {
         done();
       }
       index++;
       observer.error(new Error("Napotkano błąd podczas próby odczytu pliku"));
     });
-    obser.pipe(index2.retryPipeline).subscribe((data: any) => {}, err => {});
+    obser.pipe(index2.retryPipeline).subscribe(
+      (data: any) => {
+        return;
+      },
+      (err) => {
+        return;
+      }
+    );
   });
 });
 
 describe("index - testy integracyjne", () => {
   let index: Index;
-  let fileName = `${stringGenerator()}.csv`;
+  const fileName = `${stringGenerator()}.csv`;
   jest.setTimeout(20000);
   beforeEach(() => {
     index = new Index(TEST_CONFIG_FILE_PATH);
@@ -70,7 +81,7 @@ describe("index - testy integracyjne", () => {
     mockup_pushAjaxShoperUpdate(index.shoperService.shoperUpdateService);
   });
 
-  it("gdy dane pojawią się w pliku musi przejść cały proces i dane muszą pozytywnie zostać zaktualizowane w shoperze", done => {
+  it("gdy dane pojawią się w pliku musi przejść cały proces i dane muszą pozytywnie zostać zaktualizowane w shoperze", (done) => {
     index.startWatchFile();
     let counter = 0;
     index.shoperService.doneTask$.subscribe((task: Task) => {
@@ -83,11 +94,11 @@ describe("index - testy integracyjne", () => {
     fs.writeFileSync(`tmp/${fileName}`, filonStringMerchandise, { encoding: "utf8" });
   });
 
-  it("jeśli towar przekazany do aktualizacji nie istnieje w shoperze to warunkowo ma zostać wysłany @ z powiadomieniem", done => {
-    let sendMail = jest.spyOn(index.shoperService.eMail, "sendMail").mockImplementation()
+  it("jeśli towar przekazany do aktualizacji nie istnieje w shoperze to warunkowo ma zostać wysłany @ z powiadomieniem", (done) => {
+    const sendMail = jest.spyOn(index.shoperService.eMail, "sendMail").mockImplementation();
     jest.spyOn(index.shoperService.shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
-        let emtyResponse = {
+        const emtyResponse = {
           originalEvent: null,
           xhr: null,
           request: null,
@@ -96,25 +107,28 @@ describe("index - testy integracyjne", () => {
             count: "1",
             pages: 1,
             page: 1,
-            list: []
+            list: [],
           },
           responseText: null,
-          responseType: null
+          responseType: null,
         };
         observer.next(emtyResponse);
         observer.complete();
       })
     );
 
-
     index.startWatchFile();
 
-    let counter = 0;
+    const counter = 0;
     index.shoperService.doneTask$.subscribe((task: Task) => {
-      expect(task.error.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER)
+      expect(task?.error?.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER);
       done();
     });
-    fs.writeFileSync(`tmp/${fileName}`, `product_code;stock;price;priceE
-    BSZK0F1FLE051;   2;139,57;15,00`, { encoding: "utf8" });
+    fs.writeFileSync(
+      `tmp/${fileName}`,
+      `product_code;stock;price;priceE
+    BSZK0F1FLE051;   2;139,57;15,00`,
+      { encoding: "utf8" }
+    );
   });
 });

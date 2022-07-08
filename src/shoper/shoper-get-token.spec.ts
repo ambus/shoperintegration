@@ -4,6 +4,7 @@ import { mockupData_shoperGetToken, mockup_shoperGetToken } from "../../test/moc
 import { Config } from "../config/config";
 import { stringGenerator } from "../lib/string-generator";
 import { ShoperGetToken } from "./shoper-get-token";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -14,7 +15,7 @@ describe("shoperGetToken", () => {
   });
 
   it("powinien zwracać string z tokenem", (done) => {
-    ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
+    ShoperGetToken.getToken(Config.getInstance(TEST_CONFIG_FILE_PATH).shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       done();
     });
@@ -24,7 +25,7 @@ describe("shoperGetToken", () => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       mockupData_shoperGetToken.response.access_token = stringGenerator();
-      ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, false).subscribe((val2: string) => {
+      ShoperGetToken.getToken(Config.getInstance(TEST_CONFIG_FILE_PATH).shoperConfig.userToken, false).subscribe((val2: string) => {
         expect(val).toEqual(val2);
         done();
       });
@@ -35,7 +36,7 @@ describe("shoperGetToken", () => {
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val: string) => {
       expect(val).toBeDefined();
       mockupData_shoperGetToken.response.access_token = stringGenerator();
-      ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true).subscribe((val2: string) => {
+      ShoperGetToken.getToken(Config.getInstance(TEST_CONFIG_FILE_PATH).shoperConfig.userToken, true).subscribe((val2: string) => {
         expect(val).not.toEqual(val2);
         done();
       });
@@ -49,7 +50,7 @@ describe("shoperGetToken", () => {
 
 describe("shoperGetToken - błędy połączenia", () => {
   it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd", (done) => {
-    let errorString = "Błąd przy pobieraniu tokena";
+    const errorString = "Błąd przy pobieraniu tokena";
     let counter = -1;
     jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
@@ -59,7 +60,9 @@ describe("shoperGetToken - błędy połączenia", () => {
     );
 
     ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, 200, 3).subscribe(
-      (val: string) => {},
+      (val: string) => {
+        return;
+      },
       (err) => {
         expect(counter).toBe(3);
         expect(err.message).toBe("Napotkano błąd podczas pobierania tokena uwierzytelniającego");
@@ -69,14 +72,21 @@ describe("shoperGetToken - błędy połączenia", () => {
   });
 
   it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", (done) => {
-    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(Observable.create((observer: AnonymousSubject<any>) => {}));
+    jest.spyOn(ShoperGetToken, "_getAjaxConnection").mockReturnValue(
+      Observable.create((observer: AnonymousSubject<any>) => {
+        return;
+      })
+    );
     const startTime = Date.now();
 
     const delayTimeInMilisec = 50;
     const maxRetryAttempts = 3;
+    // jest.setTimeout(20000);
 
-    ShoperGetToken.getToken(Config.getInstance().shoperConfig.userToken, true, delayTimeInMilisec, maxRetryAttempts).subscribe(
-      (val: string) => {},
+    ShoperGetToken.getToken(Config.getInstance(TEST_CONFIG_FILE_PATH).shoperConfig.userToken, true, delayTimeInMilisec, maxRetryAttempts).subscribe(
+      (val: string) => {
+        return;
+      },
       (err) => {
         expect(startTime + delayTimeInMilisec + delayTimeInMilisec * maxRetryAttempts).toBeLessThan(Date.now());
         expect(err.error.name).toBe("TimeoutError");

@@ -94,7 +94,7 @@ export class ShoperService {
     };
   }
 
-  getToken(refresh: boolean = false): Observable<string> {
+  getToken(refresh = false): Observable<string> {
     return ShoperGetToken.getToken(this.config.shoperConfig.userToken, refresh, this.config.shoperConfig.delayTimeInMilisec, this.config.shoperConfig.maxRetryAttempts);
   }
 
@@ -136,9 +136,9 @@ export class ShoperService {
     tap((request: Task) => this.connectionPoolIsFree$.next()),
     catchError((err) => {
       this.logger.error(`Napotkano błąd podczas próby wykonania zadania.`, err);
-      let message = `Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd. Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.
+      const message = `Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd. Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.
       Napotkany błąd spowodował zakończenie strumienia. Niezbędny jest restart serwisu oraz ręczna aktualizacja danych w systemie shoper!. Treść błędu: ${JSON.stringify(err)}`;
-      let messageHtml = `<h2>Błąd</h2>
+      const messageHtml = `<h2>Błąd</h2>
       <h3>Podczas próby aktualizacji danych w systemie Shoper, napotkano błąd!</h3>
       <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
       <p style="color: red">Prosimy o ręczną aktualizację!</p>
@@ -151,8 +151,8 @@ export class ShoperService {
     }),
     finalize(() => {
       this.logger.error("Strumień zakończył pracę");
-      let message = `Serwer wstrzymał pracę - potrzebny jest restart`;
-      let messageHtml = `<h2 style="color: red">Błąd krytyczny</h2>
+      const message = `Serwer wstrzymał pracę - potrzebny jest restart`;
+      const messageHtml = `<h2 style="color: red">Błąd krytyczny</h2>
         <h3>Serwer wstrzymał pracę - potrzebny jest restart!</h3>
       `;
       this.eMail.sendMail(`🔥🔥🔥 Serwer wstrzymał pracę - potrzebny jest restart!`, message, messageHtml, this.config.emailNoticication.adminsNotifications);
@@ -178,15 +178,15 @@ export class ShoperService {
   sendEmailWithErrorMessage(task: Task): void {
     this.logger.debug("Próba wysłania maila");
 
-    let message = `Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${
+    const message = `Podczas próby aktualizacji danych w systemie Shoper dla towaru o symbolu ${
       task.filonMerchandise.product_code
     }, napotkano błąd. Prawdopodobnie dane który miały zostać zakutalizowane nie zostały przesłane na serwer. Prosimy o ręczną aktualizację ponieważ dane które są w systemie shoper nie będą odpowiadały prawdzie. Z programu Filon otrzymano dane(kod, ilość, cena, cenaE): ${
       task.filonMerchandise.product_code
-    } | ${task.filonMerchandise.stock} | ${task.filonMerchandise.price} | ${task.filonMerchandise.priceE}. Dane na temat towaru przekazane przez system shoper: ${JSON.stringify(task)}. Treść błędu: ${
+    } | ${task.filonMerchandise.stock} | ${task.filonMerchandise.price} | ${task.filonMerchandise.priceE} | ${task.filonMerchandise.other_price}. Dane na temat towaru przekazane przez system shoper: ${JSON.stringify(task)}. Treść błędu: ${
       task["message"]
     }`;
 
-    let messageHtml = `<h2>Błąd</h2>
+    const messageHtml = `<h2>Błąd</h2>
         <h3>Podczas próby aktualizacji towaru o symbolu ${task.filonMerchandise.product_code}, napotkano błąd!</h3>
         <p>Prawdopodobnie dane który miały zostać zaktualizowane nie zostały przesłane na serwer.</p>
         <p style="color: red">Prosimy o ręczną aktualizację!</p>

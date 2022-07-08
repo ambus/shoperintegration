@@ -13,7 +13,7 @@ const logger = getLogger("ShoperGetToken");
 export class ShoperGetToken {
   static authorizationToken: string;
 
-  static getToken(userToken: string, refreshToken: boolean, delayTimeInMilisec: number = 1000, maxRetryAttempts: number = 3): Observable<string> {
+  static getToken(userToken: string, refreshToken: boolean, delayTimeInMilisec = 1000, maxRetryAttempts = 3): Observable<string> {
     if (refreshToken || !this.authorizationToken) {
       return this._getAjaxConnection(userToken, refreshToken).pipe(
         tap(console.warn),
@@ -38,9 +38,16 @@ export class ShoperGetToken {
   }
 
   static _getAjaxConnection(userToken: string, refreshToken: boolean): Observable<AjaxResponse> {
-    let createXHR = function () {
+    const createXHR = function () {
       return new XMLHttpRequest();
     };
-    return ajax({ createXHR, url: Config.getInstance().shoperConfig.urls.token, crossDomain: true, withCredentials: false, method: "POST", headers: { Authorization: `Basic ${userToken}` } });
+    return ajax({
+      createXHR,
+      url: Config.getInstance().shoperConfig.urls.token,
+      crossDomain: true,
+      withCredentials: false,
+      method: "POST",
+      headers: { Authorization: `Basic ${userToken}` },
+    });
   }
 }

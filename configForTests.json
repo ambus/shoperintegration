@@ -33,7 +33,7 @@
         "path": "tmp",
         "fileName": "test4.csv"
     },
-    "errorDelayTime": 50,
+    "errorDelayTime": 500,
     "attempsWhenError": 5,
     "shoperConfig": {
         "urls": {
@@ -43,7 +43,7 @@
             "productStocksUpdate": ""
         },
         "userToken": "",
-        "delayTimeInMilisec": 1000,
+        "delayTimeInMilisec": 10,
         "maxRetryAttempts": 3
     },
     "smtpConfig": {
@@ -72,6 +72,6 @@
     },
     "backup": {
         "filelocation": "./tmp/backup",
-        "status": false
+        "status": true
     }
 }

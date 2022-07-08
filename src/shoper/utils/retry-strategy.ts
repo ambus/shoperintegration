@@ -1,7 +1,7 @@
 import { Observable, timer, throwError } from "rxjs";
 import { mergeMap, finalize } from "rxjs/operators";
 import { Logger, getLogger } from "log4js";
-let logger: Logger = getLogger("retryStrategy");
+const logger: Logger = getLogger("retryStrategy");
 
 export const retryStrategy = ({
   maxRetryAttempts = 3,

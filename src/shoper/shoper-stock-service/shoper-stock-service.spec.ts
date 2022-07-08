@@ -2,17 +2,17 @@ import { Config } from "../../config/config";
 import { ShoperStockService } from "./shoper-stock-service";
 import { stringGenerator } from "../../lib/string-generator";
 import { ShoperStock } from "../../models/shoper-stock";
-import { of, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { AjaxResponse } from "rxjs/ajax";
 import { shoperStockMockup, mockup_getAjaxStock } from "../../../test/mockup/shoper-stock.mockup";
 import { AnonymousSubject } from "rxjs/internal/Subject";
 import { ErrorType } from "../../models/error-type";
-import { config } from "aws-sdk";
+const TEST_CONFIG_FILE_PATH = "configForTests.json";
 
 describe("shoperStockService", () => {
   let shoperStockService: ShoperStockService;
   beforeAll(() => {
-    shoperStockService = new ShoperStockService(Config.getInstance());
+    shoperStockService = new ShoperStockService(Config.getInstance(TEST_CONFIG_FILE_PATH));
     mockup_getAjaxStock(shoperStockService);
   });
 
@@ -24,7 +24,7 @@ describe("shoperStockService", () => {
     expect(shoperStockService._getAjaxStocks).toBeDefined();
   });
 
-  it("_getAjaxStocks zwraca obiekt AjaxResponse z obiektem ShoperReturnList z listą obiektów ShoperStock", done => {
+  it("_getAjaxStocks zwraca obiekt AjaxResponse z obiektem ShoperReturnList z listą obiektów ShoperStock", (done) => {
     shoperStockService._getAjaxStocks(stringGenerator(), stringGenerator()).subscribe((observer: AjaxResponse) => {
       expect(observer.response).toBeDefined();
       expect(observer.response.list).toBeDefined();
@@ -34,7 +34,7 @@ describe("shoperStockService", () => {
     });
   });
 
-  it("funkcja getStock musi zwracać obiekt Observable z wyłapanym obiektem Stocks", done => {
+  it("funkcja getStock musi zwracać obiekt Observable z wyłapanym obiektem Stocks", (done) => {
     shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe((observer: ShoperStock) => {
       expect(observer).toBeDefined();
       expect(observer.stock_id).toBeDefined();
@@ -48,12 +48,12 @@ describe("shoperStockService - błędy połączenia", () => {
   //   shoperStockService = new ShoperStockService(Config.getInstance());
   //   mockup_getAjaxStock(shoperStockService);
   // });
-  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd jeśli błędy się powtarzają", done => {
-    let shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
+  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i zwrócić błąd jeśli błędy się powtarzają", (done) => {
+    const shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance(TEST_CONFIG_FILE_PATH));
 
-    let errorString = "Błąd przy pobieraniu stocka";
+    const errorString = "Błąd przy pobieraniu stocka";
     let counter = -1;
-    jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
+    const spy = jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
         counter++;
         observer.error(errorString);
@@ -61,8 +61,11 @@ describe("shoperStockService - błędy połączenia", () => {
     );
 
     shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
-      (observer: ShoperStock) => {},
-      err => {
+      (observer: ShoperStock) => {
+        return;
+      },
+      (err) => {
+// expect(spy).toBeCalledTimes(3);
         expect(counter).toBe(3);
         expect(err).toBe("Błąd przy pobieraniu stocka");
         done();
@@ -70,10 +73,10 @@ describe("shoperStockService - błędy połączenia", () => {
     );
   });
 
-  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i w 3 próbie prawidłowo wykonać zadanie", done => {
-    let shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
+  it("jeśli funkcja napotka błąd podczas próby pobrania tokena to powinna ponowić próbę połączenia określoną ilość razy z zadanymi przerwami i w 3 próbie prawidłowo wykonać zadanie", (done) => {
+    const shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
 
-    let errorString = "Błąd przy pobieraniu stocka";
+    const errorString = "Błąd przy pobieraniu stocka";
     let counter = -1;
     jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
@@ -93,18 +96,18 @@ describe("shoperStockService - błędy połączenia", () => {
         expect(val.stock_id).toBe(shoperStockMockup.response.list[0].stock_id);
         done();
       },
-      err => {
+      (err) => {
         expect(false).toBeTruthy();
       }
     );
   });
 
-  it("Jeśli shoper zwróci informację ale bez danych towaru to zwrócić błąd z opisem że towaru nie ma w bazie shopera", done => {
-    let shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
+  it("Jeśli shoper zwróci informację ale bez danych towaru to zwrócić błąd z opisem że towaru nie ma w bazie shopera", (done) => {
+    const shoperStockService: ShoperStockService = new ShoperStockService(Config.getInstance());
 
     jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
-        let emtyResponse = {
+        const emtyResponse = {
           originalEvent: null,
           xhr: null,
           request: null,
@@ -113,10 +116,10 @@ describe("shoperStockService - błędy połączenia", () => {
             count: "1",
             pages: 1,
             page: 1,
-            list: []
+            list: [],
           },
           responseText: null,
-          responseType: null
+          responseType: null,
         };
         observer.next(emtyResponse);
         observer.complete();
@@ -124,34 +127,37 @@ describe("shoperStockService - błędy połączenia", () => {
     );
 
     shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
-      (val: ShoperStock ) => {
+      (val: ShoperStock) => {
+        return;
       },
-      err => {
-        expect(err.constructor.name).toBe("ErrorInTask")
+      (err) => {
+        expect(err.constructor.name).toBe("ErrorInTask");
         expect(err.errorType).toBe(ErrorType.ITEM_NOT_FOUND_IN_SHOPER);
         done();
       }
     );
   });
 
-  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", done => {
-    let config: Config = Config.getInstance();
+  it("Jeśli podczas próby połączenia nie otrzymamy odpowiedzi w ciągu określonego czasu powinniśmy zwracać błąd", (done) => {
+    const config: Config = Config.getInstance();
     const errorDelayTIme = 500;
     config.errorDelayTime = errorDelayTIme;
-    let shoperStockService: ShoperStockService = new ShoperStockService(config);
+    const shoperStockService: ShoperStockService = new ShoperStockService(config);
 
     jest.spyOn(shoperStockService, "_getAjaxStocks").mockReturnValue(
       Observable.create((observer: AnonymousSubject<any>) => {
+        return;
       })
     );
     const startTime = Date.now();
 
     shoperStockService.getStock(stringGenerator(), stringGenerator()).subscribe(
-      (val: ShoperStock ) => {
+      (val: ShoperStock) => {
+        return;
       },
-      err => {
+      (err) => {
         expect(startTime + errorDelayTIme).toBeLessThanOrEqual(Date.now());
-        expect(err.name).toBe("TimeoutError")
+        expect(err.name).toBe("TimeoutError");
         done();
       }
     );

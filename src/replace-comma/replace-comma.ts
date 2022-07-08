@@ -11,6 +11,9 @@ export function replaceCommaInPrice(): OperatorFunction<FilonMerchandise[], Filo
           if (filonMerchandise.priceE) {
             filonMerchandise.priceE = filonMerchandise.priceE.replace(",", ".");
           }
+          if (filonMerchandise.other_price) {
+            filonMerchandise.other_price = filonMerchandise.other_price.replace(",", ".");
+          }
           return filonMerchandise;
         });
         return filonMerchandises;

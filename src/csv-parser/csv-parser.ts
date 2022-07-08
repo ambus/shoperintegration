@@ -54,8 +54,8 @@ export function parseCSVDataStream(parseOptions: ParserOptions): OperatorFunctio
 }
 
 function changeCodeFromNumberToString(merchandiseArray: FilonMerchandise[]): FilonMerchandise[] {
-  let merchandises = [...merchandiseArray];
-  for (let merchandise of merchandises) {
+  const merchandises = [...merchandiseArray];
+  for (const merchandise of merchandises) {
     merchandise.product_code = merchandise.product_code.toString();
   }
   return merchandises;

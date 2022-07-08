@@ -43,10 +43,10 @@ export class ShoperStockService {
   }
 
   _getAjaxStocks(userToken: string, itemCode: string): Observable<AjaxResponse> {
-    let createXHR = function() {
+    const createXHR = function() {
       return new XMLHttpRequest();
     };
-    let url = `${this.config.shoperConfig.urls.productStocks}?filters={"code":"${itemCode}"}`;
+    const url = `${this.config.shoperConfig.urls.productStocks}?filters={"code":"${itemCode}"}`;
     return ajax({ createXHR, url: url, crossDomain: true, withCredentials: false, method: "GET", headers: { Authorization: `Bearer ${userToken}` } });
   }
 

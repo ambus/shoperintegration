@@ -20,7 +20,7 @@ describe("shoperService", () => {
   let shoperService: ShoperService;
   beforeEach(() => {
     mockup_shoperGetToken();
-    shoperService = new ShoperService(Config.getInstance());
+    shoperService = new ShoperService(Config.getInstance(TEST_CONFIG_FILE_PATH));
     shoperService.shoperStockService;
     mockup_getAjaxStock(shoperService.shoperStockService);
     mockup_pushAjaxShoperUpdate(shoperService.shoperUpdateService);
@@ -35,7 +35,7 @@ describe("shoperService", () => {
   });
 
   it("po dodaniu taska serwis powinien go przekazać do strumienia z zadaniami", (done) => {
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService._taskRequest$.subscribe((val: Task) => {
       expect(val.filonMerchandise.product_code).toEqual(filonMerchandise.product_code);
       expect(val.id).toBeDefined();
@@ -45,7 +45,7 @@ describe("shoperService", () => {
   });
 
   it("każde zadanie powinno posiadać swoje id i status requested", (done) => {
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService._taskRequest$.subscribe((val: Task) => {
       expect(val.id).toBeDefined();
       expect(val.id.length).toBeGreaterThan(5);
@@ -56,7 +56,7 @@ describe("shoperService", () => {
   });
 
   it("każde zadanie po dodaniu i zwolnieniu kolejki powinno się pojawic w strumieniu wykonywanych zadań", (done) => {
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.doneTask$.subscribe((val: Task) => {
       expect(val.id).toBeDefined();
       expect(val.id.length).toBeGreaterThan(5);
@@ -73,7 +73,7 @@ describe("shoperService", () => {
       done();
     });
     for (let index = 0; index < 3; index++) {
-      let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1 + index, price: (6 + index).toString(), warnLevel: 2 };
+      const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1 + index, price: (6 + index).toString(), warnLevel: 2, other_price: "11.00" };
       shoperService.addTask(filonMerchandise);
     }
   });
@@ -83,7 +83,7 @@ describe("shoperService", () => {
       expect(val.shoperConnectionTokenID.length).toBeGreaterThan(1);
       done();
     });
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.addTask(filonMerchandise);
   });
 
@@ -93,32 +93,32 @@ describe("shoperService", () => {
       expect(val.shoperStock).toBe(shoperStockMockup.response.list[0]);
       done();
     });
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.addTask(filonMerchandise);
   });
 
   it("po dodaniu towaru do strumienia powinien pojawić się wykonany task w strumieniu zakończonych zadań", (done) => {
-    let stock = Math.round(Math.random() * 100);
+    const stock = Math.round(Math.random() * 100);
     shoperService.doneTask$.subscribe((val: Task) => {
       expect(val.shoperStock).toBeDefined();
       expect(val.shoperStock).toBe(shoperStockMockup.response.list[0]);
       expect(val.shoperConnectionTokenID).toBeDefined();
       expect(val.updateStatus).toBe(1);
-      expect(val.stockToUpdate.stock).toBe(stock.toString());
+      expect(val?.stockToUpdate?.stock).toBe(stock.toString());
       done();
     });
-    let filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: stock, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: stringGenerator(), stock: stock, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.addTask(filonMerchandise);
   });
 });
 
 describe("shoperService - błędy połączenia", () => {
   it("jeśli wykonywanie zadania się nie powiedzie to należy ponowić próbę jego wykonania zgodnie w ilości podanej w konfiguracji", (done) => {
-    let config = Config.getInstance();
+    const config = Config.getInstance();
     config.shoperConfig.delayTimeInMilisec = 50;
-    let shoperServiceInside = new ShoperService(config);
+    const shoperServiceInside = new ShoperService(config);
 
-    let errorString = "Błąd przy pobieraniu tokena";
+    const errorString = "Błąd przy pobieraniu tokena";
     let counter = 0;
 
     jest.spyOn(shoperServiceInside, "getToken").mockReturnValue(
@@ -128,7 +128,7 @@ describe("shoperService - błędy połączenia", () => {
       })
     );
 
-    let sendMail = jest.spyOn(shoperServiceInside.eMail, "sendMail");
+    const sendMail = jest.spyOn(shoperServiceInside.eMail, "sendMail");
 
     shoperServiceInside.doneTask$.subscribe((task: Task) => {
       expect(task.attemptCounter).toBe(config.shoperConfig.maxRetryAttempts);
@@ -137,24 +137,24 @@ describe("shoperService - błędy połączenia", () => {
       expect(sendMail).toBeCalled();
       done();
     });
-    let product_code = stringGenerator();
+    const product_code = stringGenerator();
 
-    let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2 , other_price: "11.00"};
     shoperServiceInside.addTask(filonMerchandise);
   });
 
   it("jeśli podczas pobierania danych z shopera napotkamy błąd musimy ponowić próbę z odświeżonym tokenem połączenia", (done) => {
-    let config = Config.getInstance();
+    const config = Config.getInstance();
     config.shoperConfig.delayTimeInMilisec = 50;
-    let shoperService = new ShoperService(config);
+    const shoperService = new ShoperService(config);
 
-    let getShoperStock = jest.spyOn(shoperService.shoperStockService, "getStock").mockReturnValue(
+    const getShoperStock = jest.spyOn(shoperService.shoperStockService, "getStock").mockReturnValue(
       Observable.create((observer: AnonymousSubject<ShoperStock>) => {
         observer.error(new ErrorInTask("Towaru nie ma w bazie danych shopera", {}, ErrorType.UNDEFINED));
       })
     );
 
-    let sendMail = jest.spyOn(shoperService.eMail, "sendMail");
+    const sendMail = jest.spyOn(shoperService.eMail, "sendMail");
 
     shoperService.doneTask$.subscribe((task: Task) => {
       expect(task.attemptCounter).toBe(config.shoperConfig.maxRetryAttempts);
@@ -162,15 +162,15 @@ describe("shoperService - błędy połączenia", () => {
       expect(sendMail).toBeCalled();
       done();
     });
-    let product_code = stringGenerator();
+    const product_code = stringGenerator();
 
-    let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.addTask(filonMerchandise);
   });
 
   it("jeśli połączenie zwróci błąd 401 system powinien ponowić próbę uzyskania tokena autoryzacyjnego", (done) => {
     mockup_shoperGetToken();
-    let shoperService = new ShoperService(Config.getInstance(TEST_CONFIG_FILE_PATH));
+    const shoperService = new ShoperService(Config.getInstance(TEST_CONFIG_FILE_PATH));
     shoperService.shoperStockService;
     let counter = 0;
     jest.spyOn(shoperService, "getToken").mockReturnValue(
@@ -193,9 +193,9 @@ describe("shoperService - błędy połączenia", () => {
       }
     });
 
-    let product_code = stringGenerator();
+    const product_code = stringGenerator();
 
-    let filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2 };
+    const filonMerchandise: FilonMerchandise = { product_code: product_code, stock: 1, price: "16.00", warnLevel: 2, other_price: "11.00" };
     shoperService.addTask(filonMerchandise);
   });
 });
