@@ -16,7 +16,13 @@ export class CompareService {
       return source.pipe(
         tap((task: Task) => (taskToUpdate = task)),
         map((task: Task) => {
-          task.stockToUpdate = { stock: task.filonMerchandise.stock.toString(), warn_level: this.getWarnLevel(task.filonMerchandise.warnLevel, task.shoperStock.warn_level) };
+          task.stockToUpdate = {
+            stock: task.filonMerchandise.stock.toString(),
+            warn_level: this.getWarnLevel(task.filonMerchandise.warnLevel, task.shoperStock.warn_level),
+          };
+          if (task.filonMerchandise.other_price) {
+            task.stockToUpdate.price_buying = task.filonMerchandise.other_price;
+          }
           return task;
         }),
         catchError((err: any, caught: Observable<Task>) => {
@@ -28,7 +34,7 @@ export class CompareService {
   }
 
   getWarnLevel(warnLevel: number, oldWarnLevel: string): string {
-    if(typeof warnLevel === "undefined") return oldWarnLevel;
+    if (typeof warnLevel === "undefined") return oldWarnLevel;
     if (warnLevel <= 0) return "0";
     return Math.floor(warnLevel).toString();
   }

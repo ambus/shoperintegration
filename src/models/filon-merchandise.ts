@@ -4,4 +4,5 @@ export type FilonMerchandise = {
   price: string;
   priceE?: string;
   warnLevel: number;
+  other_price: string;
 };
